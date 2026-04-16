@@ -2,152 +2,208 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Фестиваль профессий | Люберецкий техникум</title>
     <link rel="stylesheet" href="style.css">
+    <!-- CodeMirror для редактора кода -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
 </head>
 <body>
-
-    <!-- ЭКРАН 1: СТАРТ -->
-    <div id="screen-start" class="screen active">
-        <div class="logo-container">
-            <img src="media/images/logo.png" alt="Логотип" class="logo">
-        </div>
-        
-        <div class="npc-container">
-            <img src="media/images/npc-gagarich.png" alt="Гагарич" class="npc-avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Crect fill=%22%2300d4ff%22 width=%22120%22 height=%22120%22 rx=%2260%22/%3E%3Ctext x=%2260%22 y=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2260%22%3E🤖%3C/text%3E%3C/svg%3E'">
-            <div class="speech-bubble">
-                <p><strong>Привет! Я Гагарич</strong> 🤖✨</p>
-                <p>Твой цифровой гид по Фестивалю профессий.</p>
-                <p>Готов найти свою идеальную профессию?</p>
+    <div id="app-container">
+        <!-- ЭКРАН 1: СТАРТ -->
+        <div id="screen-start" class="screen active">
+            <div class="logo-container">
+                <img src="media/images/logo.png" alt="Логотип" class="logo">
             </div>
-        </div>
-        
-        <div class="start-controls">
-            <label class="checkbox-container">
-                <input type="checkbox" id="save-progress" checked>
-                <span class="checkmark"></span>
-                Сохранять прогресс
-            </label>
-            <button class="btn btn-primary pulse" onclick="App.startGame()">Начать приключение →</button>
-        </div>
-    </div>
-
-    <!-- ЭКРАН 2: ПЕРСОНАЖ -->
-    <div id="screen-profile" class="screen">
-        <button class="btn-back-top" onclick="App.showScreen('screen-start')">← Назад</button>
-        
-        <div class="profile-content">
-            <h2>Создай свой профиль</h2>
             
-            <div class="form-group">
-                <label>Как к тебе обращаться?</label>
-                <input type="text" id="player-name" placeholder="Имя или ник" maxlength="20">
+            <div class="npc-container">
+                <img src="media/images/npc-gagarich.png" alt="Гагарич" class="npc-avatar" 
+                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%2300d4ff%22/%3E%3Ctext x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2240%22%3E🤖%3C/text%3E%3C/svg%3E'">
+                <div class="speech-bubble">
+                    <p><strong>Привет! Я Гагарич</strong> 🤖✨</p>
+                    <p>Твой цифровой гид по Фестивалю профессий.</p>
+                    <p>Готов найти свою идеальную профессию?</p>
+                </div>
             </div>
+            
+            <div class="start-controls">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="save-progress" checked>
+                    <span class="checkmark"></span>
+                    Сохранять прогресс
+                </label>
+                <button class="btn btn-primary pulse" onclick="App.startGame()">Начать приключение →</button>
+            </div>
+        </div>
 
-            <div class="form-group">
-                <label>Твой уровень (класс)</label>
-                <div class="radio-group">
-                    <label class="radio-card">
-                        <input type="radio" name="grade" value="8">
-                        <div class="card-content">
-                            <span class="level-badge">8</span>
-                            <span>8 класс<br><small>Лёгкие задания</small></span>
-                        </div>
-                    </label>
-                    <label class="radio-card">
-                        <input type="radio" name="grade" value="9" checked>
-                        <div class="card-content">
-                            <span class="level-badge">9</span>
-                            <span>9 класс<br><small>Средний уровень</small></span>
-                        </div>
-                    </label>
-                    <label class="radio-card">
-                        <input type="radio" name="grade" value="10">
-                        <div class="card-content">
-                            <span class="level-badge">10-11</span>
-                            <span>10-11 класс<br><small>Хардкор</small></span>
-                        </div>
-                    </label>
+        <!-- ЭКРАН 2: ПРОФИЛЬ -->
+        <div id="screen-profile" class="screen">
+            <button class="btn-back-top" onclick="App.showScreen('screen-start')">← Назад</button>
+            
+            <div class="profile-content">
+                <h2>Создай свой профиль</h2>
+                
+                <div class="form-group">
+                    <label>Как к тебе обращаться?</label>
+                    <input type="text" id="player-name" placeholder="Имя или ник" maxlength="20">
+                </div>
+
+                <div class="form-group">
+                    <label>Твой уровень (класс)</label>
+                    <div class="radio-group">
+                        <label class="radio-card">
+                            <input type="radio" name="grade" value="8">
+                            <div class="card-content">
+                                <span class="level-badge">8</span>
+                                <span>8 класс<br><small>Лёгкие задания</small></span>
+                            </div>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="grade" value="9" checked>
+                            <div class="card-content">
+                                <span class="level-badge">9</span>
+                                <span>9 класс<br><small>Средний уровень</small></span>
+                            </div>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="grade" value="10">
+                            <div class="card-content">
+                                <span class="level-badge">10-11</span>
+                                <span>10-11 класс<br><small>Хардкор</small></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Выбери аватар</label>
+                    <div class="avatar-grid" id="avatar-grid"></div>
+                </div>
+
+                <button class="btn btn-primary" id="btn-create-profile" onclick="App.saveProfile()" disabled>Далее →</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 3: ВВОДНАЯ ЛОКАЦИЯ -->
+        <div id="screen-intro" class="screen">
+            <button class="btn-back-top" onclick="App.showScreen('screen-profile')">← Назад</button>
+            
+            <div class="player-panel" id="player-panel-intro">
+                <img src="" alt="Аватар" class="player-avatar" id="player-avatar-intro"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%2300d4ff%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 font-size=%2216%22%3E👤%3C/text%3E%3C/svg%3E'">
+                <span class="player-name" id="player-name-intro"></span>
+            </div>
+            
+            <div class="location-header">
+                <span class="loc-id">📍 Локация 0: Ворота фестиваля</span>
+                <div class="timer-container">
+                    <div class="timer-bar"><div class="timer-bar-fill"></div></div>
+                    <span id="timer-text">03:00</span>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Выбери аватар</label>
-                <div class="avatar-grid" id="avatar-grid">
+            <div class="game-area" id="game-area"></div>
+
+            <div class="controls">
+                <button class="btn btn-secondary" id="btn-hint" onclick="Game.showHint()" disabled>💡 Подсказка</button>
+                <button class="btn btn-primary" id="btn-next-game" onclick="Game.nextStep()" disabled>Далее →</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 4: ИНТЕРАКТИВНАЯ КАРТА -->
+        <div id="screen-map" class="screen">
+            <button class="btn-back-top" onclick="App.showScreen('screen-intro')">← Назад</button>
+            
+            <div class="map-header">
+                <div class="player-panel-mini">
+                    <img src="" alt="Аватар" class="mini-avatar" id="map-avatar"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2230%22 height=%2230%22%3E%3Ccircle cx=%2215%22 cy=%2215%22 r=%2215%22 fill=%22%2300d4ff%22/%3E%3Ctext x=%2215%22 y=%2220%22 text-anchor=%22middle%22 font-size=%2212%22%3E👤%3C/text%3E%3C/svg%3E'">
+                    <span class="player-name" id="map-name"></span>
+                </div>
+                <div class="progress-text">
+                    Пройдено: <span id="map-progress-count">0/12</span>
+                </div>
+            </div>
+            
+            <h2 style="text-align:center; margin:10px 0;">🗺️ Карта фестиваля</h2>
+            <div class="map-grid" id="map-grid"></div>
+            
+            <button class="btn btn-primary" id="btn-finish-map" style="display:none; margin-top:20px;" onclick="App.finishGame()">
+                🏁 Завершить фестиваль и получить результат
+            </button>
+        </div>
+
+        <!-- ЭКРАН 5: КЛАСТЕР (МИНИ-ИГРЫ) -->
+        <div id="screen-cluster" class="screen">
+            <button class="btn-back-top" onclick="Cluster.goBackToMap()">← На карту</button>
+            
+            <div class="cluster-header">
+                <h2 id="cluster-title">💻 IT & Кибербез</h2>
+                <div class="timer-container">
+                    <div class="timer-bar" id="cluster-timer-bar"><div class="timer-bar-fill"></div></div>
+                    <span id="cluster-timer-text">03:00</span>
                 </div>
             </div>
 
-            <button class="btn btn-primary" id="btn-create-profile" onclick="App.saveProfile()" disabled>Далее →</button>
-        </div>
-    </div>
+            <div class="game-area" id="cluster-game-area"></div>
 
-    <!-- ЭКРАН 3: ВВОДНАЯ ЛОКАЦИЯ -->
-    <div id="screen-intro" class="screen">
-        <button class="btn-back-top" onclick="App.showScreen('screen-profile')">← Назад</button>
-        
-        <!-- Панель игрока -->
-        <div class="player-panel" id="player-panel-intro">
-            <img src="" alt="Аватар" class="player-avatar" id="player-avatar-intro">
-            <span class="player-name" id="player-name-intro"></span>
-        </div>
-        
-        <div class="location-header">
-            <span class="loc-id">📍 Локация 0: Ворота фестиваля</span>
-            <div class="timer-container">
-                <div class="timer-bar" id="timer-bar"><div class="timer-bar-fill"></div></div>
-                <span id="timer-text">03:00</span>
+            <div class="controls">
+                <button class="btn btn-secondary" id="cluster-btn-hint" onclick="Cluster.showHint()" disabled>💡 Подсказка</button>
+                <button class="btn btn-primary" id="cluster-btn-next" onclick="Cluster.nextGame()" disabled>Далее →</button>
             </div>
         </div>
 
-        <div class="game-area" id="game-area">
+        <!-- ЭКРАН 6: ФИНАЛ / РЕЗУЛЬТАТЫ -->
+        <div id="screen-final" class="screen">
+            <!-- Заполняется динамически из Final.show() -->
         </div>
 
-        <div class="controls">
-            <button class="btn btn-secondary" id="btn-hint" onclick="Game.hints.show()" disabled>💡 Подсказка</button>
-            <button class="btn btn-primary" id="btn-next-game" onclick="Game.nextStep()" disabled>Далее →</button>
+        <!-- МОДАЛЬНЫЕ ОКНА -->
+        <!-- Подсказка -->
+        <div id="modal-hint" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="UI.closeHint()">&times;</span>
+                <h3>💡 Подсказка от Гагарича</h3>
+                <div class="hint-story" id="hint-story"></div>
+                <p id="hint-text"></p>
+                <button class="btn btn-secondary" onclick="UI.closeHint()">Понятно</button>
+            </div>
+        </div>
+
+        <!-- Таймаут -->
+        <div id="modal-timeout" class="modal">
+            <div class="modal-content warning">
+                <h3>⏰ Время вышло!</h3>
+                <p>Время вышло! Не переживай — в техникуме научим работать и в дедлайны, и в комфортном ритме.</p>
+                <button class="btn btn-primary" onclick="Game.timeoutNext()">Продолжить</button>
+            </div>
+        </div>
+
+        <!-- Выбор специальности в кластере -->
+        <div id="modal-specialty" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="Cluster.closeSpecialtyModal()">&times;</span>
+                <h3>Выбери специализацию</h3>
+                <p id="specialty-question">Какая задача тебе ближе?</p>
+                <div id="specialty-options" class="specialty-options-container"></div>
+            </div>
         </div>
     </div>
 
-    <!-- ЭКРАН 4: КАРТА (Заглушка) -->
-    <div id="screen-map" class="screen">
-        <button class="btn-back-top" onclick="App.showScreen('screen-intro')">← Назад</button>
-        
-        <!-- Панель игрока -->
-        <div class="player-panel" id="player-panel-map">
-            <img src="" alt="Аватар" class="player-avatar" id="player-avatar-map">
-            <span class="player-name" id="player-name-map"></span>
-        </div>
-        
-        <div class="map-placeholder">
-            <h2>🗺️ Карта фестиваля</h2>
-            <p>Интерактивная карта появится в Части 2!</p>
-            <h3 style="margin-top: 20px;">Твои топ-3 направления:</h3>
-            <div id="top3-list"></div>
-            <button class="btn btn-primary" style="margin-top: 20px;" onclick="alert('В Части 2 здесь будет карта!')">Продолжить</button>
-        </div>
-    </div>
-
-    <!-- МОДАЛКА ПОДСКАЗКИ -->
-    <div id="modal-hint" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="Game.hints.close()">&times;</span>
-            <h3>💡 Подсказка от Гагарича</h3>
-            <div class="hint-story" id="hint-story"></div>
-            <p id="hint-text"></p>
-            <button class="btn btn-secondary" onclick="Game.hints.close()">Понятно</button>
-        </div>
-    </div>
-
-    <!-- МОДАЛКА ТАЙМАУТА -->
-    <div id="modal-timeout" class="modal">
-        <div class="modal-content warning">
-            <h3>⏰ Время вышло!</h3>
-            <p>Время вышло! Не переживай — в техникуме научим работать и в дедлайны, и в комфортном ритме.</p>
-            <button class="btn btn-primary" onclick="Game.timeoutNext()">Продолжить</button>
-        </div>
-    </div>
-
+    <!-- Библиотеки -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/powershell/powershell.min.js"></script>
+    
+    <!-- Основной скрипт игры и части -->
     <script src="script.js"></script>
+    <script src="parts/part1-intro.js"></script>
+    <script src="parts/part2-map-clusters.js"></script>
+    <script src="parts/part3-clusters5-8.js"></script>
+    <script src="parts/part4-final.js"></script>
 </body>
 </html>
