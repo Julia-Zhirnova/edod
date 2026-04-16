@@ -54,6 +54,22 @@ const DATA = {
     }
 };
 
+// Соседи кластеров для разблокировки
+const CLUSTER_NEIGHBORS = {
+    it: ["auto", "business"],
+    avia: ["chem", "it"],
+    chem: ["avia", "auto"],
+    auto: ["it", "chem"],
+    business: ["it", "law"],
+    law: ["business", "pedagogy"],
+    pedagogy: ["law", "food"],
+    food: ["pedagogy", "design"],
+    design: ["food", "safety"],
+    safety: ["design", "land"],
+    land: ["safety", "zhk"],
+    zhk: ["land", "business"]
+};
+
 // ---------- ГЛОБАЛЬНОЕ СОСТОЯНИЕ ----------
 let gameState = {
     step: "start",
@@ -380,9 +396,9 @@ const Map = {
         const grid = document.getElementById('map-grid');
         grid.innerHTML = "";
         const completed = gameState.completedClusters || [];
-        const unlocked = gameState.unlockedClusters || [];
+        const unlocked = this.getUnlockedClusters();
         Object.entries(DATA.clusters).forEach(([id, c]) => {
-            const isUnlocked = unlocked.includes(id) || completed.includes(id);
+            const isUnlocked = unlocked.includes(id);
             const isCompleted = completed.includes(id);
             const node = document.createElement('div');
             node.className = `map-node ${isUnlocked ? 'unlocked' : 'locked'} ${isCompleted ? 'completed' : ''}`;
@@ -391,7 +407,15 @@ const Map = {
             grid.appendChild(node);
         });
         document.getElementById('map-progress-count').textContent = `${completed.length}/12`;
-        document.getElementById('btn-finish-map').style.display = completed.length >= 4 ? 'block' : 'none';
+        document.getElementById('btn-finish-map').style.display = completed.length >= 3 ? 'block' : 'none';
+    },
+    getUnlockedClusters() {
+        const unlocked = new Set(gameState.unlockedClusters || []);
+        (gameState.completedClusters || []).forEach(id => {
+            unlocked.add(id);
+            (CLUSTER_NEIGHBORS[id] || []).forEach(n => unlocked.add(n));
+        });
+        return Array.from(unlocked);
     }
 };
 
@@ -435,7 +459,6 @@ const Cluster = {
         document.getElementById('cluster-btn-hint').disabled = false;
         const clusterId = gameState.currentCluster;
         const spec = gameState.selectedSpecialtyCode;
-        // Вызов соответствующего модуля игр (определён в подключаемых файлах)
         const gameModule = window[`Games${clusterId.charAt(0).toUpperCase()+clusterId.slice(1)}`];
         if (gameModule) gameModule.render(area, spec, diff);
         else area.innerHTML = `<p>Ошибка: модуль игр для кластера ${clusterId} не найден.</p>`;
@@ -455,27 +478,55 @@ const Cluster = {
     },
     finishCluster() {
         Timer.stop();
-        if (!gameState.completedClusters.includes(gameState.currentCluster)) gameState.completedClusters.push(gameState.currentCluster);
+        if (!gameState.completedClusters.includes(gameState.currentCluster)) {
+            gameState.completedClusters.push(gameState.currentCluster);
+        }
         Storage.save();
-        App.showScreen('screen-map');
+        if (gameState.completedClusters.length === 3) {
+            this.showContinueDialog();
+        } else {
+            App.showScreen('screen-map');
+        }
+    },
+    showContinueDialog() {
+        const modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>🎉 Ты прошёл 3 кластера!</h3>
+                <p>Хочешь продолжить исследовать карту или завершить и получить свой персональный рейтинг?</p>
+                <button class="btn btn-primary" id="continue-btn">Продолжить</button>
+                <button class="btn btn-secondary" id="finish-btn">Завершить и увидеть результат</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById('continue-btn').onclick = () => {
+            modal.remove();
+            App.showScreen('screen-map');
+        };
+        document.getElementById('finish-btn').onclick = () => {
+            modal.remove();
+            App.finishGame();
+        };
     },
     goBackToMap() { Timer.stop(); App.showScreen('screen-map'); },
     showHint() {
         const hints = {
-            it: "Проверь синтаксис команды. В Linux для смены пароля используется passwd.",
-            avia: "Допуск ±0.05 означает, что годные размеры от 119.95 до 120.05.",
-            chem: "Нейтральный pH = 7. Для точного объёма используют мерную колбу.",
-            auto: "Диагностику начинают с аккумулятора. Код P0300 — пропуски зажигания.",
-            business: "Проводка: дебет 41 — кредит 60. НДФЛ 13%.",
-            law: "Конституция — основной закон. Претензия: шапка → описание → требование → приложения.",
-            pedagogy: "Этапы урока: оргмомент, актуализация, объяснение, закрепление, рефлексия.",
-            food: "Бисквит опадает от перепада температур. 200 г муки на 4 порции → 500 г на 10.",
-            design: "Комплементарные цвета: красный и зелёный. Для текста лучше шрифт с засечками.",
-            safety: "Электроустановки тушат углекислотным огнетушителем. Время эвакуации = путь / скорость.",
-            land: "Масштаб 1:1000 → 1 см = 10 м. Площадь 60×40 = 2400 м² = 0.24 га.",
-            zhk: "Подготовка к зиме — промывка и опрессовка отопления. ОДН = (разница) * (доля площади) * тариф."
+            it: { story: "Для сложной игры: готовая функция проверки IP", tip: "def is_valid_ip(ip):\n    parts = ip.split('.')\n    if len(parts) != 4: return False\n    for p in parts:\n        if not p.isdigit(): return False\n        if not 0 <= int(p) <= 255: return False\n    return True" },
+            avia: { story: "Допуск ±0.05 означает, что годные размеры от 119.95 до 120.05.", tip: "Выбери все значения в этом диапазоне." },
+            chem: { story: "Нейтральный pH = 7. Для точного объёма используют мерную колбу.", tip: "Правильный ответ: 7 и мерная колба." },
+            auto: { story: "Диагностику начинают с аккумулятора. Код P0300 — пропуски зажигания.", tip: "Проверь аккумулятор, затем свечи." },
+            business: { story: "Проводка: дебет 41 — кредит 60. НДФЛ 13%.", tip: "Зарплата на руки = (оклад + премия) * 0.87." },
+            law: { story: "Конституция — основной закон. Претензия: шапка → описание → требование → приложения.", tip: "Срок хранения личных дел — 75 лет." },
+            pedagogy: { story: "Этапы урока: оргмомент, актуализация, объяснение, закрепление, рефлексия.", tip: "Начни с организации, закончи рефлексией." },
+            food: { story: "Бисквит опадает от перепада температур.", tip: "Не открывай духовку первые 20 минут." },
+            design: { story: "Комплементарные цвета: красный и зелёный.", tip: "Для текста лучше шрифт с засечками." },
+            safety: { story: "Электроустановки тушат углекислотным огнетушителем.", tip: "Время эвакуации = путь / скорость." },
+            land: { story: "Масштаб 1:1000 → 1 см = 10 м.", tip: "Площадь в гектарах: 1 га = 10000 м²." },
+            zhk: { story: "Подготовка к зиме — промывка и опрессовка отопления.", tip: "ОДН = (разница) * (доля площади) * тариф." }
         };
-        UI.showHint("💡 Подсказка от Гагарича", hints[gameState.currentCluster] || "Подумай логически!");
+        const h = hints[gameState.currentCluster] || { story: "Подумай логически!", tip: "Используй знания, полученные в школе." };
+        UI.showHint(h.story, h.tip);
     }
 };
 
