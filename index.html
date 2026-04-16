@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Фестиваль профессий | Люберецкий техникум</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ЭКРАН 1: СТАРТ -->
+    <div id="screen-start" class="screen active">
+        <div class="logo-container">
+            <img src="media/images/logo.png" alt="Логотип" class="logo">
+        </div>
+        
+        <div class="npc-container">
+            <img src="media/images/npc-gagarich.png" alt="Гагарич" class="npc-avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Crect fill=%22%2300d4ff%22 width=%22120%22 height=%22120%22 rx=%2260%22/%3E%3Ctext x=%2260%22 y=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2260%22%3E🤖%3C/text%3E%3C/svg%3E'">
+            <div class="speech-bubble">
+                <p><strong>Привет! Я Гагарич</strong> 🤖✨</p>
+                <p>Твой цифровой гид по Фестивалю профессий.</p>
+                <p>Готов найти свою идеальную профессию?</p>
+            </div>
+        </div>
+        
+        <div class="start-controls">
+            <label class="checkbox-container">
+                <input type="checkbox" id="save-progress" checked>
+                <span class="checkmark"></span>
+                Сохранять прогресс
+            </label>
+            <button class="btn btn-primary pulse" onclick="App.startGame()">Начать приключение →</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 2: ПЕРСОНАЖ -->
+    <div id="screen-profile" class="screen">
+        <button class="btn-back-top" onclick="App.showScreen('screen-start')">← Назад</button>
+        
+        <div class="profile-content">
+            <h2>Создай свой профиль</h2>
+            
+            <div class="form-group">
+                <label>Как к тебе обращаться?</label>
+                <input type="text" id="player-name" placeholder="Имя или ник" maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label>Твой уровень (класс)</label>
+                <div class="radio-group">
+                    <label class="radio-card">
+                        <input type="radio" name="grade" value="8">
+                        <div class="card-content">
+                            <span class="level-badge">8</span>
+                            <span>8 класс<br><small>Лёгкие задания</small></span>
+                        </div>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="grade" value="9" checked>
+                        <div class="card-content">
+                            <span class="level-badge">9</span>
+                            <span>9 класс<br><small>Средний уровень</small></span>
+                        </div>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="grade" value="10">
+                        <div class="card-content">
+                            <span class="level-badge">10-11</span>
+                            <span>10-11 класс<br><small>Хардкор</small></span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Выбери аватар</label>
+                <div class="avatar-grid" id="avatar-grid">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-create-profile" onclick="App.saveProfile()" disabled>Далее →</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: ВВОДНАЯ ЛОКАЦИЯ -->
+    <div id="screen-intro" class="screen">
+        <button class="btn-back-top" onclick="App.showScreen('screen-profile')">← Назад</button>
+        
+        <!-- Панель игрока -->
+        <div class="player-panel" id="player-panel-intro">
+            <img src="" alt="Аватар" class="player-avatar" id="player-avatar-intro">
+            <span class="player-name" id="player-name-intro"></span>
+        </div>
+        
+        <div class="location-header">
+            <span class="loc-id">📍 Локация 0: Ворота фестиваля</span>
+            <div class="timer-container">
+                <div class="timer-bar" id="timer-bar"><div class="timer-bar-fill"></div></div>
+                <span id="timer-text">03:00</span>
+            </div>
+        </div>
+
+        <div class="game-area" id="game-area">
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" id="btn-hint" onclick="Game.hints.show()" disabled>💡 Подсказка</button>
+            <button class="btn btn-primary" id="btn-next-game" onclick="Game.nextStep()" disabled>Далее →</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 4: КАРТА (Заглушка) -->
+    <div id="screen-map" class="screen">
+        <button class="btn-back-top" onclick="App.showScreen('screen-intro')">← Назад</button>
+        
+        <!-- Панель игрока -->
+        <div class="player-panel" id="player-panel-map">
+            <img src="" alt="Аватар" class="player-avatar" id="player-avatar-map">
+            <span class="player-name" id="player-name-map"></span>
+        </div>
+        
+        <div class="map-placeholder">
+            <h2>🗺️ Карта фестиваля</h2>
+            <p>Интерактивная карта появится в Части 2!</p>
+            <h3 style="margin-top: 20px;">Твои топ-3 направления:</h3>
+            <div id="top3-list"></div>
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="alert('В Части 2 здесь будет карта!')">Продолжить</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА ПОДСКАЗКИ -->
+    <div id="modal-hint" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="Game.hints.close()">&times;</span>
+            <h3>💡 Подсказка от Гагарича</h3>
+            <div class="hint-story" id="hint-story"></div>
+            <p id="hint-text"></p>
+            <button class="btn btn-secondary" onclick="Game.hints.close()">Понятно</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА ТАЙМАУТА -->
+    <div id="modal-timeout" class="modal">
+        <div class="modal-content warning">
+            <h3>⏰ Время вышло!</h3>
+            <p>Время вышло! Не переживай — в техникуме научим работать и в дедлайны, и в комфортном ритме.</p>
+            <button class="btn btn-primary" onclick="Game.timeoutNext()">Продолжить</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
