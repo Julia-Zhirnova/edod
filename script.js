@@ -54,6 +54,15 @@ const DATA = {
     }
 };
 
+// ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
 // ---------- ГЛОБАЛЬНОЕ СОСТОЯНИЕ ----------
 let gameState = {
     step: "start",
@@ -110,7 +119,7 @@ const Storage = {
     }
 };
 
-// ---------- ТАЙМЕР (только для кластерных игр) ----------
+// ---------- ТАЙМЕР ----------
 const Timer = {
     interval: null,
     timeLeft: 180,
@@ -133,11 +142,11 @@ const Timer = {
     updateUI() {
         const m = Math.floor(this.timeLeft / 60);
         const s = this.timeLeft % 60;
-        const timerText = document.getElementById('cluster-timer-text');
+        const timerText = document.getElementById('cluster-timer-text') || document.getElementById('timer-text');
         if (timerText) {
             timerText.textContent = `${m}:${s < 10 ? '0'+s : s}`;
         }
-        const fill = document.querySelector('#cluster-timer-bar .timer-bar-fill');
+        const fill = document.querySelector('#cluster-timer-bar .timer-bar-fill, .timer-bar-fill');
         if (fill) {
             const pct = (this.timeLeft / 180) * 100;
             fill.style.width = pct + '%';
@@ -155,6 +164,18 @@ const UI = {
     },
     closeHint() {
         document.getElementById('modal-hint').classList.remove('active');
+    },
+    showTimeoutModal(message, onClose) {
+        const modal = document.getElementById('modal-timeout');
+        modal.querySelector('p').textContent = message;
+        modal.classList.add('active');
+        const btn = modal.querySelector('button');
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.onclick = () => {
+            modal.classList.remove('active');
+            if (onClose) onClose();
+        };
     }
 };
 
@@ -163,17 +184,27 @@ const App = {
     init() {
         Storage.load();
         this.renderAvatars();
-        this.restoreState(); // определяет, куда направить пользователя
+        if (gameState.step !== "start" && gameState.step !== "profile") {
+            if (gameState.step === "intro") {
+                gameState.step = "map";
+                Storage.save();
+            }
+            this.showScreen(`screen-${gameState.step}`);
+        } else {
+            this.showScreen(`screen-${gameState.step}`);
+        }
     },
     showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         const screenEl = document.getElementById(id);
         if (screenEl) screenEl.classList.add('active');
         window.scrollTo(0, 0);
-        if (id === 'screen-map' || id === 'screen-cluster') {
+        if (id === 'screen-map') {
+            this.updatePlayerPanel(id);
+            if (typeof Map !== 'undefined') Map.init();
+        } else if (id === 'screen-cluster') {
             this.updatePlayerPanel(id);
         }
-        if (id === 'screen-map') Map.init();
     },
     renderAvatars() {
         const grid = document.getElementById('avatar-grid');
@@ -209,15 +240,15 @@ const App = {
         gameState.step = "intro";
         gameState.currentGame = 0;
         Storage.save();
-        
-        // Обновляем панель игрока перед переходом (хотя на intro её нет, но на карте будет)
-        this.updatePlayerPanel('screen-map'); // предзаполним для будущего
         this.showScreen('screen-intro');
         Game.startIntroGame(0);
     },
     updatePlayerPanel(screenId) {
         let avatarEl, nameEl;
-        if (screenId === 'screen-map') {
+        if (screenId === 'screen-intro') {
+            avatarEl = document.getElementById('player-avatar-intro');
+            nameEl = document.getElementById('player-name-intro');
+        } else if (screenId === 'screen-map') {
             avatarEl = document.getElementById('map-avatar');
             nameEl = document.getElementById('map-name');
         } else if (screenId === 'screen-cluster') {
@@ -231,43 +262,15 @@ const App = {
     },
     startGame() { this.showScreen('screen-profile'); },
     restoreState() {
-        // Если сохранение есть и шаг не start, определяем куда идти
-        if (gameState.step !== "start") {
-            // Восстанавливаем поля профиля
-            const nameInput = document.getElementById('player-name');
-            if (nameInput) nameInput.value = gameState.name;
-            document.querySelectorAll('input[name="grade"]').forEach(r => {
-                if (parseInt(r.value) === gameState.grade) r.checked = true;
-            });
-            this.updatePlayerPanel('screen-map');
-            
-            // Если вводные игры уже завершены, показываем карту
-            if (gameState.step === "intro" && gameState.currentGame >= 3) {
-                // Вводные завершены, но step ещё intro? Переводим на карту
-                gameState.step = "map";
-                Storage.save();
-                this.showScreen('screen-map');
-            } else if (gameState.step === "intro") {
-                // Продолжаем с текущей вводной игры
-                this.showScreen('screen-intro');
-                Game.startIntroGame(gameState.currentGame);
-            } else if (gameState.step === "map") {
-                this.showScreen('screen-map');
-            } else if (gameState.step === "cluster") {
-                // Если были в кластере, но страница обновилась — возвращаем на карту
-                gameState.step = "map";
-                Storage.save();
-                this.showScreen('screen-map');
-            }
-        } else {
-            // Проверяем поля профиля при старте
-            const nameInput = document.getElementById('player-name');
-            if (nameInput) nameInput.addEventListener('input', () => this.checkProfileValid());
-            document.querySelectorAll('input[name="grade"]').forEach(r => r.addEventListener('change', () => this.checkProfileValid()));
+        if (document.getElementById('player-name')) {
+            document.getElementById('player-name').value = gameState.name;
         }
+        document.querySelectorAll('input[name="grade"]').forEach(r => {
+            if (parseInt(r.value) === gameState.grade) r.checked = true;
+        });
     },
     finishGame() {
-        Final.show();
+        if (typeof Final !== 'undefined') Final.show();
     },
     restartGame() {
         if (confirm('Прогресс будет удалён. Начать заново?')) {
@@ -277,21 +280,18 @@ const App = {
     }
 };
 
-// ---------- ВВОДНЫЕ ИГРЫ (без таймера) ----------
+// ---------- ВВОДНЫЕ ИГРЫ ----------
 const Game = {
     startIntroGame(index) {
         gameState.currentGame = index;
-        document.getElementById('intro-loc-num').textContent = index + 1;
         document.getElementById('btn-next-game').disabled = true;
         document.getElementById('btn-hint').disabled = false;
         const area = document.getElementById('game-area');
         area.innerHTML = "";
-        
         if (index === 0) this.renderGame1(area);
         else if (index === 1) this.renderGame2(area);
         else if (index === 2) this.renderGame3(area);
     },
-
     renderGame1(area) {
         const opts = [
             { icon: "🔧", text: "Работать руками — собирать, чинить, создавать", keys: { practical: 2, analytic: 1 } },
@@ -311,8 +311,6 @@ const Game = {
         Object.entries(keys).forEach(([k,v]) => gameState.psych[k] += v);
         this.gameSuccess();
     },
-
-    // Игра 2: Ситуация на фестивале — выбор минимум 3 задач
     renderGame2(area) {
         const tasks = [
             { text: "🎨 Нарисовать афишу и оформление", cluster: "design", psych: "creative" },
@@ -328,7 +326,6 @@ const Game = {
             { text: "🎓 Провести викторину для детей", cluster: "pedagogy", psych: "communicative" },
             { text: "🏠 Проверить освещение и розетки", cluster: "zhk", psych: "org" }
         ];
-
         let html = `<h3>📋 Ситуация на фестивале</h3><p>Выбери минимум 3 задачи, которыми ты займёшься:</p>`;
         tasks.forEach((task) => {
             html += `<button class="game-btn g2-btn" data-psych="${task.psych}" onclick="Game.toggleSelectG2(this)">${task.text}</button>`;
@@ -336,23 +333,13 @@ const Game = {
         html += `<button class="btn btn-primary" style="margin-top:15px;" onclick="Game.finishGame2()">Готово</button>`;
         area.innerHTML = html;
     },
-    toggleSelectG2(btn) {
-        btn.classList.toggle('selected');
-    },
+    toggleSelectG2(btn) { btn.classList.toggle('selected'); },
     finishGame2() {
         const selected = document.querySelectorAll('.g2-btn.selected');
-        if (selected.length < 3) {
-            alert("Нужно выбрать минимум 3 задачи!");
-            return;
-        }
-        selected.forEach(btn => {
-            const psychType = btn.dataset.psych;
-            gameState.psych[psychType] += 2;
-        });
+        if (selected.length < 3) { alert("Нужно выбрать минимум 3 задачи!"); return; }
+        selected.forEach(btn => { gameState.psych[btn.dataset.psych] += 2; });
         this.gameSuccess();
     },
-
-    // Игра 3: Твой стиль работы — выбор минимум 3 утверждений
     renderGame3(area) {
         const opts = [
             { txt: "🎨 Творческие задачи без рамок", psych: "creative" },
@@ -373,27 +360,20 @@ const Game = {
         html += `<button class="btn btn-primary" onclick="Game.finishGame3()">Готово</button>`;
         area.innerHTML = html;
     },
-    toggleSelectG3(btn) {
-        btn.classList.toggle('selected');
-    },
+    toggleSelectG3(btn) { btn.classList.toggle('selected'); },
     finishGame3() {
         const sel = document.querySelectorAll('.g3-btn.selected');
         if (sel.length < 3) { alert("Выбери минимум 3 варианта!"); return; }
         sel.forEach(b => gameState.psych[b.dataset.psych] += 2);
         this.gameSuccess();
     },
-
     gameSuccess() {
-        // Таймер не используется
         document.getElementById('btn-hint').disabled = true;
         document.getElementById('btn-next-game').disabled = false;
     },
     nextStep() {
-        if (gameState.currentGame < 2) {
-            this.startIntroGame(gameState.currentGame + 1);
-        } else {
-            this.finishIntro();
-        }
+        if (gameState.currentGame < 2) this.startIntroGame(gameState.currentGame + 1);
+        else this.finishIntro();
     },
     timeoutNext() {
         document.getElementById('modal-timeout').classList.remove('active');
@@ -434,7 +414,7 @@ const Map = {
             const isCompleted = completed.includes(id);
             const node = document.createElement('div');
             node.className = `map-node ${isUnlocked ? 'unlocked' : 'locked'} ${isCompleted ? 'completed' : ''}`;
-            if (isUnlocked) node.onclick = () => { Cluster.enter(id); };
+            if (isUnlocked) node.onclick = () => { if (typeof Cluster !== 'undefined') Cluster.enter(id); };
             node.innerHTML = `<span class="map-node-icon">${c.icon}</span><span class="map-node-title">${c.name}</span><span class="map-node-desc">${c.specs.length} специальности</span>${!isUnlocked?'<span>🔒</span>':''}${isCompleted?'<span>✅</span>':''}`;
             grid.appendChild(node);
         });
@@ -457,13 +437,11 @@ const Map = {
     }
 };
 
-// ---------- КЛАСТЕР (с таймером) ----------
+// ---------- КЛАСТЕР ----------
 const Cluster = {
     enter(id) {
         gameState.currentCluster = id;
         gameState.clusterGameIndex = 0;
-        gameState.step = "cluster";
-        Storage.save();
         App.showScreen('screen-cluster');
         document.getElementById('cluster-title').textContent = DATA.clusters[id].icon + ' ' + DATA.clusters[id].name;
         this.showSpecialtySelect();
@@ -501,7 +479,7 @@ const Cluster = {
     },
     loadGame(diff) {
         Timer.stop();
-        Timer.start(180, () => { this.nextGame(); });
+        Timer.start(180, () => { this.timeoutCluster(); });
         const area = document.getElementById('cluster-game-area');
         area.innerHTML = "";
         document.getElementById('cluster-btn-next').disabled = true;
@@ -529,6 +507,12 @@ const Cluster = {
             this.finishCluster();
         }
     },
+    timeoutCluster() {
+        Timer.stop();
+        UI.showTimeoutModal('Упс, ты не успел, какая жалость...', () => {
+            App.showScreen('screen-map');
+        });
+    },
     finishCluster() {
         Timer.stop();
         const clusterId = gameState.currentCluster;
@@ -543,7 +527,6 @@ const Cluster = {
         if (!gameState.completedClusters.includes(clusterId)) {
             gameState.completedClusters.push(clusterId);
         }
-        gameState.step = "map";
         Storage.save();
         if (gameState.completedClusters.length === 3 || gameState.completedClusters.length === 6 || gameState.completedClusters.length === 9) {
             this.showContinueDialog();
@@ -562,8 +545,7 @@ const Cluster = {
     goBackToMap() {
         Timer.stop();
         document.querySelectorAll('.modal.active').forEach(modal => modal.classList.remove('active'));
-        gameState.step = "map";
-        Storage.save();
+        if (typeof Map !== 'undefined') Map.init();
         App.showScreen('screen-map');
     },
     showHint() {
@@ -579,7 +561,7 @@ const Cluster = {
     }
 };
 
-// ---------- ФИНАЛ (использует существующий screen-final) ----------
+// ---------- ФИНАЛ ----------
 const Final = {
     show() {
         Timer.stop();
@@ -592,15 +574,8 @@ const Final = {
         const sortedSpecs = Object.entries(specScores).sort((a, b) => b[1] - a[1]);
         const top3 = sortedSpecs.slice(0, 3);
         
-        const screenFinal = document.getElementById('screen-final');
-        screenFinal.innerHTML = ''; // очищаем
-        
-        const container = document.createElement('div');
-        container.className = 'final-content';
-        container.style.width = '100%';
-        container.style.maxWidth = '600px';
-        container.style.margin = '0 auto';
-        
+        const container = document.getElementById('screen-final');
+        container.innerHTML = ''; // очищаем
         let html = `<div class="player-panel-center"><img src="media/images/${gameState.avatar}" class="player-avatar"><span class="player-name">${gameState.name}</span></div>`;
         html += `<div class="logo-container"><img src="media/images/logo.png" class="logo"></div>`;
         html += `<h2>${gameState.name}, твой путь!</h2>`;
@@ -610,9 +585,8 @@ const Final = {
         html += `<button class="btn btn-secondary" id="btn-back-to-map-final">Вернуться на карту</button>`;
         html += `<button class="btn btn-secondary" id="btn-restart">Пройти заново</button></div>`;
         container.innerHTML = html;
-        screenFinal.appendChild(container);
         
-        const top3Div = container.querySelector('#top3-specs');
+        const top3Div = document.getElementById('top3-specs');
         const medals = ['🥇','🥈','🥉'];
         top3.forEach(([code, score], idx) => {
             const spec = DATA.specialties[code];
@@ -621,48 +595,59 @@ const Final = {
             const div = document.createElement('div');
             div.className = `top3-item ${['gold','silver','bronze'][idx]}`;
             div.innerHTML = `<div class="rank">${medals[idx]} ${idx+1} место</div><div class="name">${spec.name}</div><div>${code}</div>`;
-            if (spec.isProf) div.innerHTML += `<div class="professionalet-badge-container"><span class="professionalet-text">ПРОФЕССИОНАЛИТЕТ</span></div>`;
+            if (spec.isProf) div.innerHTML += `<img src="media/images/professionalet-badge.png" alt="Профессионалитет" class="professionalet-badge-img">`;
             div.innerHTML += `<div>🏫 ${campus.name}<br>💰 Бюджет: ${spec.budget}${spec.paid ? ' | Платно: '+spec.paid : ''}<br>🎯 Баллы: ${score}</div>`;
             top3Div.appendChild(div);
         });
         
-        container.querySelector('#toggle-full-list').onclick = () => {
-            const fullDiv = container.querySelector('#full-list');
+        document.getElementById('toggle-full-list').onclick = () => {
+            const fullDiv = document.getElementById('full-list');
             if (fullDiv.style.display === 'none') {
                 fullDiv.innerHTML = '';
                 sortedSpecs.forEach(([code, score]) => {
                     const spec = DATA.specialties[code];
                     if (!spec) return;
                     const p = document.createElement('p');
-                    p.textContent = `${code} ${spec.name} — ${score} баллов`;
+                    p.style.display = 'flex';
+                    p.style.alignItems = 'center';
+                    p.style.gap = '8px';
+                    p.innerHTML = `<span>${code} ${spec.name} — ${score} баллов</span>`;
+                    if (spec.isProf) {
+                        const img = document.createElement('img');
+                        img.src = 'media/images/professionalet-badge.png';
+                        img.alt = 'Профессионалитет';
+                        img.className = 'professionalet-badge-img-small';
+                        p.appendChild(img);
+                    }
                     fullDiv.appendChild(p);
                 });
                 fullDiv.style.display = 'block';
-                container.querySelector('#toggle-full-list').textContent = 'Скрыть список';
+                document.getElementById('toggle-full-list').textContent = 'Скрыть список';
             } else {
                 fullDiv.style.display = 'none';
-                container.querySelector('#toggle-full-list').textContent = 'Показать все специальности';
+                document.getElementById('toggle-full-list').textContent = 'Показать все специальности';
             }
         };
         
-        container.querySelector('#btn-apply').onclick = () => {
+        document.getElementById('btn-apply').onclick = () => {
             if (confirm('Прогресс будет удалён. Перейти на сайт приёмной комиссии?')) {
                 Storage.clear();
                 window.location.href = 'https://luberteh.ru/pravila-priema.htm';
             }
         };
         
-        container.querySelector('#btn-back-to-map-final').onclick = () => {
+        document.getElementById('btn-back-to-map-final').onclick = () => {
             App.showScreen('screen-map');
         };
         
-        container.querySelector('#btn-restart').onclick = () => {
+        document.getElementById('btn-restart').onclick = () => {
             if (confirm('Прогресс будет удалён. Начать заново?')) {
                 Storage.clear();
                 location.reload();
             }
         };
-        
+
+        // Переключаемся на экран финала
         App.showScreen('screen-final');
     }
 };
@@ -675,10 +660,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[name="grade"]').forEach(r => r.addEventListener('change', () => App.checkProfileValid()));
 });
 
-// Экспортируем глобальные объекты
 window.App = App;
 window.Game = Game;
 window.Cluster = Cluster;
 window.UI = UI;
 window.DATA = DATA;
 window.gameState = gameState;
+window.shuffleArray = shuffleArray;

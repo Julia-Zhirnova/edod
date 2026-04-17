@@ -15,14 +15,13 @@ const clusterSafety = {
 
         let content = '';
         if (diff === 0) {
-            content = `
-                <h3>🟢 Выбор огнетушителя</h3>
-                <p>Каким тушить электроустановки под напряжением?</p>
-                <button class="game-btn" data-correct="true">Углекислотным (ОУ)</button>
-                <button class="game-btn">Пенным (ОХП)</button>
-                <button class="game-btn">Водным (ОВ)</button>
-                <button class="game-btn">Порошковым (любым)</button>
-            `;
+            const opts = [
+                { text: 'Углекислотным (ОУ)', correct: true },
+                { text: 'Пенным (ОХП)', correct: false },
+                { text: 'Водным (ОВ)', correct: false },
+                { text: 'Порошковым (любым)', correct: false }
+            ];
+            content = `<h3>🟢 Выбор огнетушителя</h3><p>Каким тушить электроустановки под напряжением?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
             const steps = [
                 'Сообщить в пожарную охрану',
@@ -30,7 +29,7 @@ const clusterSafety = {
                 'Приступить к тушению (если безопасно)',
                 'Встретить пожарных'
             ];
-            const initialOrder = [2, 0, 3, 1]; // перемешанный порядок
+            const initialOrder = [2, 0, 3, 1];
             content = this.renderSortableList('seq-list-safety', steps, initialOrder);
         } else {
             content = `
@@ -73,7 +72,15 @@ const clusterSafety = {
         if (el) el.textContent = text;
     },
 
-    // Универсальная функция создания сортируемого списка
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
+    },
+
     renderSortableList(containerId, steps, initialOrder) {
         let html = `<h3>🟡 Действия при пожаре</h3><p>Расставь действия в правильном порядке (используй кнопки ⬆️/⬇️):</p>`;
         html += `<div id="${containerId}" class="sortable-list" style="margin:15px 0;">`;

@@ -15,23 +15,21 @@ const clusterDesign = {
         
         let content = '';
         if (diff === 0) {
-            content = `
-                <h3>🟢 Цветовая гармония</h3>
-                <p>Какие цвета комплементарны?</p>
-                <button class="game-btn" data-correct="true">Красный и зелёный</button>
-                <button class="game-btn">Синий и жёлтый</button>
-                <button class="game-btn">Красный и оранжевый</button>
-                <button class="game-btn">Фиолетовый и розовый</button>
-            `;
+            const opts = [
+                { text: 'Красный и зелёный', correct: true },
+                { text: 'Синий и жёлтый', correct: false },
+                { text: 'Красный и оранжевый', correct: false },
+                { text: 'Фиолетовый и розовый', correct: false }
+            ];
+            content = `<h3>🟢 Цветовая гармония</h3><p>Какие цвета комплементарны?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `
-                <h3>🟡 Типографика</h3>
-                <p>Какой шрифт для длинного текста?</p>
-                <button class="game-btn" data-correct="true">С засечками (Times New Roman)</button>
-                <button class="game-btn">Декоративный рукописный</button>
-                <button class="game-btn">Моноширинный</button>
-                <button class="game-btn">Жирный гротеск</button>
-            `;
+            const opts = [
+                { text: 'С засечками (Times New Roman)', correct: true },
+                { text: 'Декоративный рукописный', correct: false },
+                { text: 'Моноширинный', correct: false },
+                { text: 'Жирный гротеск', correct: false }
+            ];
+            content = `<h3>🟡 Типографика</h3><p>Какой шрифт для длинного текста?</p>` + this.renderShuffledButtons(opts);
         } else {
             content = `
                 <h3>🔴 Техзадание на афишу</h3>
@@ -59,6 +57,15 @@ const clusterDesign = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
+    },
+
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
     },
 
     bindAnswer(container) {

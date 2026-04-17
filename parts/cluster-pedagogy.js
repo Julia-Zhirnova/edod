@@ -15,14 +15,13 @@ const clusterPedagogy = {
 
         let content = '';
         if (diff === 0) {
-            content = `
-                <h3>🟢 Мотивация</h3>
-                <p>Ребёнок говорит: «У меня не получится». Лучший ответ:</p>
-                <button class="game-btn" data-correct="true">«Давай попробуем вместе. Я помогу»</button>
-                <button class="game-btn">«Надо просто постараться»</button>
-                <button class="game-btn">«У других получается, и у тебя получится»</button>
-                <button class="game-btn">«Если не получится, ничего страшного»</button>
-            `;
+            const opts = [
+                { text: '«Давай попробуем вместе. Я помогу»', correct: true },
+                { text: '«Надо просто постараться»', correct: false },
+                { text: '«У других получается, и у тебя получится»', correct: false },
+                { text: '«Если не получится, ничего страшного»', correct: false }
+            ];
+            content = `<h3>🟢 Мотивация</h3><p>Ребёнок говорит: «У меня не получится». Лучший ответ:</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
             const steps = [
                 'Организационный момент',
@@ -31,7 +30,7 @@ const clusterPedagogy = {
                 'Закрепление',
                 'Рефлексия'
             ];
-            const initialOrder = [2, 0, 4, 1, 3]; // перемешанный порядок
+            const initialOrder = [2, 0, 4, 1, 3];
             content = this.renderSortableList('seq-list-pedagogy', steps, initialOrder);
         } else {
             content = `
@@ -74,7 +73,15 @@ const clusterPedagogy = {
         if (el) el.textContent = text;
     },
 
-    // Универсальная функция создания сортируемого списка
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
+    },
+
     renderSortableList(containerId, steps, initialOrder) {
         let html = `<h3>🟡 План урока</h3><p>Расставь этапы урока в правильном порядке (используй кнопки ⬆️/⬇️):</p>`;
         html += `<div id="${containerId}" class="sortable-list" style="margin:15px 0;">`;

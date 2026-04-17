@@ -15,23 +15,21 @@ const clusterZhk = {
 
         let content = '';
         if (diff === 0) {
-            content = `
-                <h3>🟢 Прибор учёта воды</h3>
-                <p>Какой счётчик измеряет расход горячей воды?</p>
-                <button class="game-btn" data-correct="true">Тахометрический счётчик воды</button>
-                <button class="game-btn">Теплосчётчик</button>
-                <button class="game-btn">Электросчётчик</button>
-                <button class="game-btn">Манометр</button>
-            `;
+            const opts = [
+                { text: 'Тахометрический счётчик воды', correct: true },
+                { text: 'Теплосчётчик', correct: false },
+                { text: 'Электросчётчик', correct: false },
+                { text: 'Манометр', correct: false }
+            ];
+            content = `<h3>🟢 Прибор учёта воды</h3><p>Какой счётчик измеряет расход горячей воды?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `
-                <h3>🟡 Подготовка к зиме</h3>
-                <p>Что обязательно для подготовки дома к отопительному сезону?</p>
-                <button class="game-btn" data-correct="true">Промывка и опрессовка системы отопления</button>
-                <button class="game-btn">Покраска фасада</button>
-                <button class="game-btn">Замена почтовых ящиков</button>
-                <button class="game-btn">Уборка подъездов</button>
-            `;
+            const opts = [
+                { text: 'Промывка и опрессовка системы отопления', correct: true },
+                { text: 'Покраска фасада', correct: false },
+                { text: 'Замена почтовых ящиков', correct: false },
+                { text: 'Уборка подъездов', correct: false }
+            ];
+            content = `<h3>🟡 Подготовка к зиме</h3><p>Что обязательно для подготовки дома к отопительному сезону?</p>` + this.renderShuffledButtons(opts);
         } else {
             content = `
                 <h3>🔴 Расчёт ОДН (электроэнергия)</h3>
@@ -62,6 +60,15 @@ const clusterZhk = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
+    },
+
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
     },
 
     bindAnswer(container) {

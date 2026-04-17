@@ -42,17 +42,25 @@ const clusterAvia = {
         if (el) el.textContent = text;
     },
 
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
+    },
+
     renderMachining(area, header, story, specCode, diff) {
         let content = '';
         if (diff === 0) {
-            content = `
-                <h3>🟢 Инструмент</h3>
-                <p>Чем нарезают внутреннюю резьбу?</p>
-                <button class="game-btn" data-correct="true">Метчик</button>
-                <button class="game-btn">Плашка</button>
-                <button class="game-btn">Сверло</button>
-                <button class="game-btn">Зенкер</button>
-            `;
+            const opts = [
+                { text: 'Метчик', correct: true },
+                { text: 'Плашка', correct: false },
+                { text: 'Сверло', correct: false },
+                { text: 'Зенкер', correct: false }
+            ];
+            content = `<h3>🟢 Инструмент</h3><p>Чем нарезают внутреннюю резьбу?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
             const steps = [
                 'Выбрать материал',
@@ -60,7 +68,7 @@ const clusterAvia = {
                 'Обработать на станке',
                 'Контроль размеров'
             ];
-            const initialOrder = [2, 0, 3, 1]; // перемешанный порядок
+            const initialOrder = [2, 0, 3, 1];
             content = this.renderSortableList('seq-list-avia', steps, initialOrder);
         } else {
             content = `
@@ -97,26 +105,27 @@ const clusterAvia = {
     renderAviaProduction(area, header, story, diff) {
         let content = '';
         if (diff === 0) {
-            content = `
-                <h3>🟢 Осмотр планера</h3>
-                <p>Что проверяют при внешнем осмотре?</p>
-                <button class="game-btn" data-correct="true">Отсутствие вмятин и трещин</button>
-                <button class="game-btn">Давление в шинах</button>
-                <button class="game-btn">Уровень масла</button>`;
+            const opts = [
+                { text: 'Отсутствие вмятин и трещин', correct: true },
+                { text: 'Давление в шинах', correct: false },
+                { text: 'Уровень масла', correct: false }
+            ];
+            content = `<h3>🟢 Осмотр планера</h3><p>Что проверяют при внешнем осмотре?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `
-                <h3>🟡 Проверка двигателя</h3>
-                <p>Какой прибор измеряет тягу двигателя?</p>
-                <button class="game-btn" data-correct="true">Тягомер</button>
-                <button class="game-btn">Манометр</button>
-                <button class="game-btn">Тахометр</button>`;
+            const opts = [
+                { text: 'Тягомер', correct: true },
+                { text: 'Манометр', correct: false },
+                { text: 'Тахометр', correct: false }
+            ];
+            content = `<h3>🟡 Проверка двигателя</h3><p>Какой прибор измеряет тягу двигателя?</p>` + this.renderShuffledButtons(opts);
         } else {
-            content = `
-                <h3>🔴 Расчёт центровки</h3>
-                <p>Масса пустого самолёта 1000 кг, центровка 25% САХ. Добавили груз 200 кг на 2 м позади ЦТ. Куда сместится центровка?</p>
-                <button class="game-btn" data-correct="true">Назад (увеличится плечо)</button>
-                <button class="game-btn">Вперёд</button>
-                <button class="game-btn">Не изменится</button>`;
+            const opts = [
+                { text: 'Назад (увеличится плечо)', correct: true },
+                { text: 'Вперёд', correct: false },
+                { text: 'Не изменится', correct: false }
+            ];
+            content = `<h3>🔴 Расчёт центровки</h3>
+                <p>Масса пустого самолёта 1000 кг, центровка 25% САХ. Добавили груз 200 кг на 2 м позади ЦТ. Куда сместится центровка?</p>` + this.renderShuffledButtons(opts);
         }
         area.innerHTML = header + content;
         this.setReplica(story);
@@ -126,33 +135,32 @@ const clusterAvia = {
     renderBpla(area, header, story, diff) {
         let content = '';
         if (diff === 0) {
-            content = `
-                <h3>🟢 Потеря связи</h3>
-                <p>Что проверить в первую очередь?</p>
-                <button class="game-btn" data-correct="true">Антенну и кабель</button>
-                <button class="game-btn">Прошивку полётного контроллера</button>
-                <button class="game-btn">Батарею</button>`;
+            const opts = [
+                { text: 'Антенну и кабель', correct: true },
+                { text: 'Прошивку полётного контроллера', correct: false },
+                { text: 'Батарею', correct: false }
+            ];
+            content = `<h3>🟢 Потеря связи</h3><p>Что проверить в первую очередь?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `
-                <h3>🟡 Настройка канала</h3>
-                <p>Какая частота обычно используется для управления БПЛА?</p>
-                <button class="game-btn" data-correct="true">2.4 ГГц</button>
-                <button class="game-btn">433 МГц</button>
-                <button class="game-btn">5.8 ГГц</button>`;
+            const opts = [
+                { text: '2.4 ГГц', correct: true },
+                { text: '433 МГц', correct: false },
+                { text: '5.8 ГГц', correct: false }
+            ];
+            content = `<h3>🟡 Настройка канала</h3><p>Какая частота обычно используется для управления БПЛА?</p>` + this.renderShuffledButtons(opts);
         } else {
-            content = `
-                <h3>🔴 Программирование автопилота</h3>
-                <p>Какой параметр отвечает за максимальный угол крена?</p>
-                <button class="game-btn" data-correct="true">ANGLE_MAX</button>
-                <button class="game-btn">ALT_HOLD</button>
-                <button class="game-btn">WP_RADIUS</button>`;
+            const opts = [
+                { text: 'ANGLE_MAX', correct: true },
+                { text: 'ALT_HOLD', correct: false },
+                { text: 'WP_RADIUS', correct: false }
+            ];
+            content = `<h3>🔴 Программирование автопилота</h3><p>Какой параметр отвечает за максимальный угол крена?</p>` + this.renderShuffledButtons(opts);
         }
         area.innerHTML = header + content;
         this.setReplica(story);
         this.bindAnswer(area);
     },
 
-    // Универсальная функция создания сортируемого списка
     renderSortableList(containerId, steps, initialOrder) {
         let html = `<h3>🟡 Правильная последовательность</h3><p>Расставь шаги по порядку (используй кнопки ⬆️/⬇️):</p>`;
         html += `<div id="${containerId}" class="sortable-list" style="margin:15px 0;">`;

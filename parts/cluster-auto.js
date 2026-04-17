@@ -56,19 +56,32 @@ const clusterAuto = {
         if (el) el.textContent = text;
     },
 
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
+    },
+
     renderSpecialist(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Диагностика</h3><p>С чего начать проверку?</p>
-                <button class="game-btn" data-correct="true">Проверить аккумулятор</button>
-                <button class="game-btn">Снять головку блока</button>
-                <button class="game-btn">Заменить свечи</button>
-                <button class="game-btn">Поменять масло</button>`;
+            const opts = [
+                { text: 'Проверить аккумулятор', correct: true },
+                { text: 'Снять головку блока', correct: false },
+                { text: 'Заменить свечи', correct: false },
+                { text: 'Поменять масло', correct: false }
+            ];
+            return `<h3>🟢 Диагностика</h3><p>С чего начать проверку?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            return `<h3>🟡 Код ошибки P0300</h3><p>Что он означает?</p>
-                <button class="game-btn" data-correct="true">Пропуски зажигания в цилиндрах</button>
-                <button class="game-btn">Неисправность датчика кислорода</button>
-                <button class="game-btn">Низкое давление масла</button>
-                <button class="game-btn">Перегрев двигателя</button>`;
+            const opts = [
+                { text: 'Пропуски зажигания в цилиндрах', correct: true },
+                { text: 'Неисправность датчика кислорода', correct: false },
+                { text: 'Низкое давление масла', correct: false },
+                { text: 'Перегрев двигателя', correct: false }
+            ];
+            return `<h3>🟡 Код ошибки P0300</h3><p>Что он означает?</p>` + this.renderShuffledButtons(opts);
         } else {
             return `<h3>🔴 Передаточное число</h3>
                 <p>Ведущая шестерня — 20 зубьев, ведомая — 60. Какое передаточное число?</p>
@@ -80,32 +93,33 @@ const clusterAuto = {
 
     renderMaster(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Первый шаг</h3><p>С чего начать замену колодок?</p>
-                <button class="game-btn" data-correct="true">Поднять машину домкратом</button>
-                <button class="game-btn">Снять колесо</button>
-                <button class="game-btn">Открутить суппорт</button>
-                <button class="game-btn">Заменить колодки</button>`;
+            const opts = [
+                { text: 'Поднять машину домкратом', correct: true },
+                { text: 'Снять колесо', correct: false },
+                { text: 'Открутить суппорт', correct: false },
+                { text: 'Заменить колодки', correct: false }
+            ];
+            return `<h3>🟢 Первый шаг</h3><p>С чего начать замену колодок?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            // Шаги в правильном логическом порядке
             const steps = [
                 'Поднять машину домкратом',
                 'Снять колесо',
                 'Открутить суппорт',
                 'Заменить колодки'
             ];
-            // Начальный перемешанный порядок (индексы): 2,0,3,1 → "Открутить суппорт", "Поднять...", "Заменить колодки", "Снять колесо"
             const initialOrder = [2, 0, 3, 1];
             return this.renderSortableList('seq-list-auto', steps, initialOrder);
         } else {
-            return `<h3>🔴 Инструмент</h3><p>Чем открутить суппорт?</p>
-                <button class="game-btn" data-correct="true">Торцевой ключ (на 13-15)</button>
-                <button class="game-btn">Разводной ключ</button>
-                <button class="game-btn">Шестигранник</button>
-                <button class="game-btn">Баллонный ключ</button>`;
+            const opts = [
+                { text: 'Торцевой ключ (на 13-15)', correct: true },
+                { text: 'Разводной ключ', correct: false },
+                { text: 'Шестигранник', correct: false },
+                { text: 'Баллонный ключ', correct: false }
+            ];
+            return `<h3>🔴 Инструмент</h3><p>Чем открутить суппорт?</p>` + this.renderShuffledButtons(opts);
         }
     },
 
-    // Универсальная функция создания сортируемого списка
     renderSortableList(containerId, steps, initialOrder) {
         let html = `<h3>🟡 Правильная последовательность</h3><p>Расставь шаги по порядку (используй кнопки ⬆️/⬇️):</p>`;
         html += `<div id="${containerId}" class="sortable-list" style="margin:15px 0;">`;
@@ -123,12 +137,10 @@ const clusterAuto = {
         return html;
     },
 
-    // Инициализация логики сортировки
     initSortableList(containerId, correctOrder, onSuccess) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        // Обработчики кнопок
         container.addEventListener('click', (e) => {
             const btn = e.target.closest('.step-btn');
             if (!btn) return;
@@ -136,7 +148,6 @@ const clusterAuto = {
             const pos = parseInt(btn.dataset.pos);
             const items = Array.from(container.querySelectorAll('.sortable-item'));
             if (btn.classList.contains('step-up') && pos > 0) {
-                // Меняем местами с предыдущим
                 const prevItem = items[pos - 1];
                 const currentItem = items[pos];
                 container.insertBefore(currentItem, prevItem);

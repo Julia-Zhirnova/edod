@@ -28,7 +28,6 @@ const clusterLaw = {
         this.setReplica(story);
 
         if (specCode === '46.02.01' && diff === 2) {
-            // Для документоведа используем сортировку
             this.initSortableList('seq-list-law', [0,1,2,3], (isCorrect) => {
                 if (isCorrect) {
                     const spec = gameState.selectedSpecialtyCode;
@@ -55,36 +54,55 @@ const clusterLaw = {
         if (el) el.textContent = text;
     },
 
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
+    },
+
     renderJurist(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Возврат билета</h3><p>Какой закон?</p>
-                <button class="game-btn" data-correct="true">Закон о защите прав потребителей</button>
-                <button class="game-btn">Гражданский кодекс</button>
-                <button class="game-btn">Трудовой кодекс</button>`;
+            const opts = [
+                { text: 'Закон о защите прав потребителей', correct: true },
+                { text: 'Гражданский кодекс', correct: false },
+                { text: 'Трудовой кодекс', correct: false }
+            ];
+            return `<h3>🟢 Возврат билета</h3><p>Какой закон?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            return `<h3>🟡 Основной закон РФ</h3><p>Как называется?</p>
-                <button class="game-btn" data-correct="true">Конституция</button>
-                <button class="game-btn">Гражданский кодекс</button>
-                <button class="game-btn">Уголовный кодекс</button>`;
+            const opts = [
+                { text: 'Конституция', correct: true },
+                { text: 'Гражданский кодекс', correct: false },
+                { text: 'Уголовный кодекс', correct: false }
+            ];
+            return `<h3>🟡 Основной закон РФ</h3><p>Как называется?</p>` + this.renderShuffledButtons(opts);
         } else {
-            return `<h3>🔴 Структура претензии</h3><p>Выбери правильную последовательность:</p>
-                <button class="game-btn" data-correct="true">Шапка → описание → требование → приложения</button>
-                <button class="game-btn">Требование → описание → шапка → приложения</button>
-                <button class="game-btn">Описание → шапка → требование → приложения</button>`;
+            const opts = [
+                { text: 'Шапка → описание → требование → приложения', correct: true },
+                { text: 'Требование → описание → шапка → приложения', correct: false },
+                { text: 'Описание → шапка → требование → приложения', correct: false }
+            ];
+            return `<h3>🔴 Структура претензии</h3><p>Выбери правильную последовательность:</p>` + this.renderShuffledButtons(opts);
         }
     },
 
     renderDocument(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Срок хранения личных дел</h3><p>Сколько лет?</p>
-                <button class="game-btn" data-correct="true">75 лет</button>
-                <button class="game-btn">5 лет</button>
-                <button class="game-btn">10 лет</button>`;
+            const opts = [
+                { text: '75 лет', correct: true },
+                { text: '5 лет', correct: false },
+                { text: '10 лет', correct: false }
+            ];
+            return `<h3>🟢 Срок хранения личных дел</h3><p>Сколько лет?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            return `<h3>🟡 Основной закон</h3><p>Как называется?</p>
-                <button class="game-btn" data-correct="true">Конституция</button>
-                <button class="game-btn">Гражданский кодекс</button>
-                <button class="game-btn">Уголовный кодекс</button>`;
+            const opts = [
+                { text: 'Конституция', correct: true },
+                { text: 'Гражданский кодекс', correct: false },
+                { text: 'Уголовный кодекс', correct: false }
+            ];
+            return `<h3>🟡 Основной закон</h3><p>Как называется?</p>` + this.renderShuffledButtons(opts);
         } else {
             const steps = [
                 'Дата',
@@ -92,12 +110,11 @@ const clusterLaw = {
                 'Заголовок',
                 'Текст'
             ];
-            const initialOrder = [2, 0, 3, 1]; // перемешанный порядок
+            const initialOrder = [2, 0, 3, 1];
             return this.renderSortableList('seq-list-law', steps, initialOrder);
         }
     },
 
-    // Универсальная функция создания сортируемого списка
     renderSortableList(containerId, steps, initialOrder) {
         let html = `<h3>🔴 Реквизиты приказа</h3><p>Расставь реквизиты в правильном порядке (используй кнопки ⬆️/⬇️):</p>`;
         html += `<div id="${containerId}" class="sortable-list" style="margin:15px 0;">`;

@@ -21,7 +21,7 @@ const clusterIt = {
 
     getHeader() {
         return `<div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-            <img src="media/images/npc-gagarich.png" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary);" onerror="this.src='image/svg+xml,...'">
+            <img src="media/images/npc-gagarich.png" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary);">
             <span style="color:var(--primary); font-weight:bold;">Гагарич:</span>
             <span id="gagarich-replica" style="color:var(--text-dim);"></span>
         </div>`;
@@ -32,6 +32,15 @@ const clusterIt = {
         if (el) el.textContent = text;
     },
 
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
+    },
+
     renderNetworkAdmin(area, header, diff) {
         const story = diff === 0 ? 'Сервер фестиваля упал! Гости не могут зарегистрироваться. Нужно срочно найти причину.' :
                      diff === 1 ? 'Служба веб-сервера не отвечает. Надо её перезапустить.' :
@@ -39,56 +48,67 @@ const clusterIt = {
         
         let content = '';
         if (diff === 0) {
-            content = `<h3>🟢 Диагностика сервера</h3><p>Какая команда покажет статус службы веб-сервера?</p>
-                <button class="game-btn" data-correct="true">systemctl status nginx</button>
-                <button class="game-btn">ping 127.0.0.1</button>
-                <button class="game-btn">ls -la /var/www</button>
-                <button class="game-btn">netstat -tulpn</button>`;
+            const opts = [
+                { text: 'systemctl status nginx', correct: true },
+                { text: 'ping 127.0.0.1', correct: false },
+                { text: 'ls -la /var/www', correct: false },
+                { text: 'netstat -tulpn', correct: false }
+            ];
+            content = `<h3>🟢 Диагностика сервера</h3><p>Какая команда покажет статус службы веб-сервера?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `<h3>🟡 Перезапуск службы</h3><p>Как перезапустить веб-сервер nginx?</p>
-                <button class="game-btn" data-correct="true">systemctl restart nginx</button>
-                <button class="game-btn">service nginx start</button>
-                <button class="game-btn">killall nginx</button>
-                <button class="game-btn">nginx -s reload</button>`;
+            const opts = [
+                { text: 'systemctl restart nginx', correct: true },
+                { text: 'service nginx start', correct: false },
+                { text: 'killall nginx', correct: false },
+                { text: 'nginx -s reload', correct: false }
+            ];
+            content = `<h3>🟡 Перезапуск службы</h3><p>Как перезапустить веб-сервер nginx?</p>` + this.renderShuffledButtons(opts);
         } else {
-            content = `<h3>🔴 Допиши недостающую строку в скрипте</h3>
-                <p>Скрипт проверки доступности сайта. Вставь пропущенную строку, которая выполняет HTTP-запрос.</p>
-                <pre style="background:#1e1e1e; color:#d4d4d4; padding:15px; border-radius:8px; overflow-x:auto; font-family:monospace; font-size:14px; text-align:left;">#!/bin/bash\nURL="http://festival.local"\n# --- Вставь недостающую строку ниже ---\n&nbsp;\n# --- Конец вставки ---\nif [ $? -eq 0 ] && [ "$http_code" -eq 200 ]; then\n    echo "OK"\nelse\n    echo "FAIL"\nfi</pre>
-                <input type="text" id="code-input" placeholder="Введи недостающую строку" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444; margin-top:15px;">
-                <button class="btn btn-primary" style="margin-top:15px;" id="check-code-btn">Проверить</button>
-                <p id="code-feedback"></p>`;
+            const opts = [
+                { text: 'http_code=$(curl -s -o /dev/null -w "%{http_code}" $URL)', correct: true },
+                { text: 'curl $URL > /dev/null', correct: false },
+                { text: 'wget --spider $URL', correct: false },
+                { text: 'ping -c 1 $URL', correct: false }
+            ];
+            content = `<h3>🔴 Мониторинг сайта</h3><p>Какая команда проверит HTTP-статус и сохранит его в переменную?</p>` + this.renderShuffledButtons(opts);
         }
 
         area.innerHTML = header + content;
         this.setReplica(story);
-        if (diff < 2) this.bindAnswer(area);
-        else this.initCodeCheck();
+        this.bindAnswer(area);
     },
 
     renderWebSupport(area, header, diff) {
-        const story = diff === 0 ? 'На сайт фестиваля нужно добавить форму обратной связи, чтобы гости могли оставить отзыв.' :
+        const story = diff === 0 ? 'На сайт фестиваля нужно добавить форму обратной связи. Сделаем поле ввода обязательным.' :
                      diff === 1 ? 'Теперь нужно проверить, что email введён корректно, прежде чем отправлять отзыв.' :
                      'Сохрани отзыв в локальном хранилище браузера, чтобы не потерять данные.';
         
         let content = '';
         if (diff === 0) {
-            content = `<h3>🟢 HTML-форма отзыва</h3><p>Какой тег создаёт поле для ввода email?</p>
-                <button class="game-btn" data-correct="true">&lt;input type="email"&gt;</button>
-                <button class="game-btn">&lt;input type="text"&gt;</button>
-                <button class="game-btn">&lt;textarea&gt;</button>
-                <button class="game-btn">&lt;form&gt;</button>`;
+            // НОВАЯ МИНИ-ИГРА ВМЕСТО УДАЛЁННОЙ (про обязательный атрибут)
+            const opts = [
+                { text: 'required', correct: true },
+                { text: 'validate', correct: false },
+                { text: 'mandatory', correct: false },
+                { text: 'check', correct: false }
+            ];
+            content = `<h3>🟢 Обязательное поле</h3><p>Какой атрибут HTML делает поле ввода обязательным для заполнения?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `<h3>🟡 Валидация email (JavaScript)</h3><p>Какое регулярное выражение проверит email?</p>
-                <button class="game-btn" data-correct="true">/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/</button>
-                <button class="game-btn">/.*@.*/</button>
-                <button class="game-btn">/^\\d+@\\d+\\.\\d+$/</button>
-                <button class="game-btn">/[A-Za-z]+@[A-Za-z]+\\.[A-Za-z]{2,}/</button>`;
+            const opts = [
+                { text: '/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/', correct: true },
+                { text: '/.*@.*/', correct: false },
+                { text: '/^\\d+@\\d+\\.\\d+$/', correct: false },
+                { text: '/[A-Za-z]+@[A-Za-z]+\.[A-Za-z]{2,}/', correct: false }
+            ];
+            content = `<h3>🟡 Валидация email (JavaScript)</h3><p>Какое регулярное выражение проверит email?</p>` + this.renderShuffledButtons(opts);
         } else {
-            content = `<h3>🔴 Сохранение отзыва</h3><p>Какой метод сохранит отзыв в localStorage?</p>
-                <button class="game-btn" data-correct="true">localStorage.setItem('review', text)</button>
-                <button class="game-btn">sessionStorage.save('review', text)</button>
-                <button class="game-btn">document.cookie = 'review='+text</button>
-                <button class="game-btn">localStorage.save('review', text)</button>`;
+            const opts = [
+                { text: 'localStorage.setItem(\'review\', text)', correct: true },
+                { text: 'sessionStorage.save(\'review\', text)', correct: false },
+                { text: 'document.cookie = \'review=\'+text', correct: false },
+                { text: 'localStorage.save(\'review\', text)', correct: false }
+            ];
+            content = `<h3>🔴 Сохранение отзыва</h3><p>Какой метод сохранит отзыв в localStorage?</p>` + this.renderShuffledButtons(opts);
         }
 
         area.innerHTML = header + content;
@@ -103,23 +123,29 @@ const clusterIt = {
         
         let content = '';
         if (diff === 0) {
-            content = `<h3>🟢 SQL-инъекция</h3><p>Какой из запросов уязвим для инъекции?</p>
-                <button class="game-btn" data-correct="true">"SELECT * FROM users WHERE name = '" + name + "'"</button>
-                <button class="game-btn">"SELECT * FROM users WHERE name = ?"</button>
-                <button class="game-btn">"SELECT * FROM users WHERE name = $1"</button>
-                <button class="game-btn">"SELECT * FROM users WHERE name = :name"</button>`;
+            const opts = [
+                { text: '"SELECT * FROM users WHERE name = \'" + name + "\'"', correct: true },
+                { text: '"SELECT * FROM users WHERE name = ?"', correct: false },
+                { text: '"SELECT * FROM users WHERE name = $1"', correct: false },
+                { text: '"SELECT * FROM users WHERE name = :name"', correct: false }
+            ];
+            content = `<h3>🟢 SQL-инъекция</h3><p>Какой из запросов уязвим для инъекции?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `<h3>🟡 Восстановление из бэкапа</h3><p>Какая команда восстановит базу MySQL из дампа?</p>
-                <button class="game-btn" data-correct="true">mysql -u root -p dbname < backup.sql</button>
-                <button class="game-btn">mysqldump dbname > backup.sql</button>
-                <button class="game-btn">pg_restore -d dbname backup.dump</button>
-                <button class="game-btn">mongoimport --db dbname backup.json</button>`;
+            const opts = [
+                { text: 'mysql -u root -p dbname < backup.sql', correct: true },
+                { text: 'mysqldump dbname > backup.sql', correct: false },
+                { text: 'pg_restore -d dbname backup.dump', correct: false },
+                { text: 'mongoimport --db dbname backup.json', correct: false }
+            ];
+            content = `<h3>🟡 Восстановление из бэкапа</h3><p>Какая команда восстановит базу MySQL из дампа?</p>` + this.renderShuffledButtons(opts);
         } else {
-            content = `<h3>🔴 Настройка iptables</h3><p>Какое правило заблокирует IP 192.168.1.100?</p>
-                <button class="game-btn" data-correct="true">iptables -A INPUT -s 192.168.1.100 -j DROP</button>
-                <button class="game-btn">iptables -A OUTPUT -d 192.168.1.100 -j REJECT</button>
-                <button class="game-btn">iptables -D INPUT -s 192.168.1.100 -j DROP</button>
-                <button class="game-btn">iptables -I FORWARD -s 192.168.1.100 -j DROP</button>`;
+            const opts = [
+                { text: 'iptables -A INPUT -s 192.168.1.100 -j DROP', correct: true },
+                { text: 'iptables -A OUTPUT -d 192.168.1.100 -j REJECT', correct: false },
+                { text: 'iptables -D INPUT -s 192.168.1.100 -j DROP', correct: false },
+                { text: 'iptables -I FORWARD -s 192.168.1.100 -j DROP', correct: false }
+            ];
+            content = `<h3>🔴 Настройка iptables</h3><p>Какое правило заблокирует IP 192.168.1.100?</p>` + this.renderShuffledButtons(opts);
         }
 
         area.innerHTML = header + content;
@@ -145,24 +171,6 @@ const clusterIt = {
         });
     },
 
-    initCodeCheck() {
-        const expected = 'http_code=$(curl -s -o /dev/null -w "%{http_code}" $URL)';
-        document.getElementById('check-code-btn').onclick = () => {
-            const input = document.getElementById('code-input').value.trim();
-            const fb = document.getElementById('code-feedback');
-            if (input === expected || input.includes('curl') && input.includes('http_code')) {
-                fb.innerHTML = '✅ Правильно!';
-                const spec = gameState.selectedSpecialtyCode;
-                if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
-                gameState.specScores[spec] += 3;
-                Cluster.gameSuccess();
-            } else {
-                fb.innerHTML = `❌ Неверно. Ожидалось: ${expected}`;
-                Cluster.gameSuccess();
-            }
-        };
-    },
-
     getHint(specCode, diff) {
         const hints = {
             '09.02.06': {
@@ -171,7 +179,7 @@ const clusterIt = {
                 2: { story: 'Нужно выполнить HTTP-запрос и сохранить код ответа. Используй curl с флагами -s -o /dev/null -w.', tip: 'http_code=$(curl -s -o /dev/null -w "%{http_code}" $URL)' }
             },
             '09.02.12': {
-                0: { story: 'Форма отзыва начинается с правильного поля ввода.', tip: 'Используй <input type="email">' },
+                0: { story: 'Атрибут required делает поле обязательным.', tip: 'required' },
                 1: { story: 'Валидация email — важный шаг. Гагарич использует простое регулярное выражение.', tip: '/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/' },
                 2: { story: 'LocalStorage позволяет сохранить отзыв даже после перезагрузки страницы.', tip: 'localStorage.setItem(\'review\', text)' }
             },

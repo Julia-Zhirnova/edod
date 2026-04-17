@@ -15,23 +15,21 @@ const clusterChem = {
         
         let content = '';
         if (diff === 0) {
-            content = `
-                <h3>🟢 Кислотность</h3>
-                <p>Какой pH у нейтрального раствора?</p>
-                <button class="game-btn" data-correct="true">7</button>
-                <button class="game-btn">1</button>
-                <button class="game-btn">14</button>
-                <button class="game-btn">0</button>
-            `;
+            const opts = [
+                { text: '7', correct: true },
+                { text: '1', correct: false },
+                { text: '14', correct: false },
+                { text: '0', correct: false }
+            ];
+            content = `<h3>🟢 Кислотность</h3><p>Какой pH у нейтрального раствора?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `
-                <h3>🟡 Посуда</h3>
-                <p>Для точного измерения объёма жидкости используют:</p>
-                <button class="game-btn" data-correct="true">Мерную колбу</button>
-                <button class="game-btn">Химический стакан</button>
-                <button class="game-btn">Коническую колбу</button>
-                <button class="game-btn">Пробирку</button>
-            `;
+            const opts = [
+                { text: 'Мерную колбу', correct: true },
+                { text: 'Химический стакан', correct: false },
+                { text: 'Коническую колбу', correct: false },
+                { text: 'Пробирку', correct: false }
+            ];
+            content = `<h3>🟡 Посуда</h3><p>Для точного измерения объёма жидкости используют:</p>` + this.renderShuffledButtons(opts);
         } else {
             content = `
                 <h3>🔴 Расчёт</h3>
@@ -59,6 +57,15 @@ const clusterChem = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
+    },
+
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
     },
 
     bindAnswer(container) {

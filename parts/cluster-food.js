@@ -47,17 +47,30 @@ const clusterFood = {
         if (el) el.textContent = text;
     },
 
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
+    },
+
     renderChef(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Санитарные нормы</h3><p>Как часто мыть руки на кухне?</p>
-                <button class="game-btn" data-correct="true">Перед началом и после каждого перерыва</button>
-                <button class="game-btn">Один раз в день</button>
-                <button class="game-btn">Только после туалета</button>`;
+            const opts = [
+                { text: 'Перед началом и после каждого перерыва', correct: true },
+                { text: 'Один раз в день', correct: false },
+                { text: 'Только после туалета', correct: false }
+            ];
+            return `<h3>🟢 Санитарные нормы</h3><p>Как часто мыть руки на кухне?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            return `<h3>🟡 Бисквит опал</h3><p>В чём причина?</p>
-                <button class="game-btn" data-correct="true">Резкий перепад температуры (рано открыли духовку)</button>
-                <button class="game-btn">Мало сахара</button>
-                <button class="game-btn">Слишком долго взбивали</button>`;
+            const opts = [
+                { text: 'Резкий перепад температуры (рано открыли духовку)', correct: true },
+                { text: 'Мало сахара', correct: false },
+                { text: 'Слишком долго взбивали', correct: false }
+            ];
+            return `<h3>🟡 Бисквит опал</h3><p>В чём причина?</p>` + this.renderShuffledButtons(opts);
         } else {
             return `<h3>🔴 Расчёт рецептуры</h3>
                 <p>На 4 порции — 200 г муки. Сколько на 10 порций?</p>
@@ -69,20 +82,26 @@ const clusterFood = {
 
     renderOperator(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Пастеризация</h3><p>Что это?</p>
-                <button class="game-btn" data-correct="true">Нагревание до 60-90°C для уничтожения микробов</button>
-                <button class="game-btn">Кипячение</button>
-                <button class="game-btn">Замораживание</button>`;
+            const opts = [
+                { text: 'Нагревание до 60-90°C для уничтожения микробов', correct: true },
+                { text: 'Кипячение', correct: false },
+                { text: 'Замораживание', correct: false }
+            ];
+            return `<h3>🟢 Пастеризация</h3><p>Что это?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            return `<h3>🟡 Критический параметр</h3><p>Что важнее при пастеризации?</p>
-                <button class="game-btn" data-correct="true">Температура и время выдержки</button>
-                <button class="game-btn">Давление</button>
-                <button class="game-btn">Скорость потока</button>`;
+            const opts = [
+                { text: 'Температура и время выдержки', correct: true },
+                { text: 'Давление', correct: false },
+                { text: 'Скорость потока', correct: false }
+            ];
+            return `<h3>🟡 Критический параметр</h3><p>Что важнее при пастеризации?</p>` + this.renderShuffledButtons(opts);
         } else {
-            return `<h3>🔴 Расчёт сырья</h3><p>Для 1 л сока нужно 1.5 кг яблок. Сколько для 500 л?</p>
-                <button class="game-btn" data-correct="true">750 кг</button>
-                <button class="game-btn">500 кг</button>
-                <button class="game-btn">1500 кг</button>`;
+            const opts = [
+                { text: '750 кг', correct: true },
+                { text: '500 кг', correct: false },
+                { text: '1500 кг', correct: false }
+            ];
+            return `<h3>🔴 Расчёт сырья</h3><p>Для 1 л сока нужно 1.5 кг яблок. Сколько для 500 л?</p>` + this.renderShuffledButtons(opts);
         }
     },
 

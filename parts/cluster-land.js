@@ -15,17 +15,21 @@ const clusterLand = {
         
         let content = '';
         if (diff === 0) {
-            content = `<h3>🟢 Масштаб карты</h3><p>Масштаб 1:1000 — 1 см на карте это:</p>
-                <button class="game-btn" data-correct="true">10 метров на местности</button>
-                <button class="game-btn">100 метров</button>
-                <button class="game-btn">1 км</button>
-                <button class="game-btn">1000 метров</button>`;
+            const opts = [
+                { text: '10 метров на местности', correct: true },
+                { text: '100 метров', correct: false },
+                { text: '1 км', correct: false },
+                { text: '1000 метров', correct: false }
+            ];
+            content = `<h3>🟢 Масштаб карты</h3><p>Масштаб 1:1000 — 1 см на карте это:</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            content = `<h3>🟡 Геодезический прибор</h3><p>Для измерения превышений используют:</p>
-                <button class="game-btn" data-correct="true">Нивелир</button>
-                <button class="game-btn">Теодолит</button>
-                <button class="game-btn">Тахеометр</button>
-                <button class="game-btn">Дальномер</button>`;
+            const opts = [
+                { text: 'Нивелир', correct: true },
+                { text: 'Теодолит', correct: false },
+                { text: 'Тахеометр', correct: false },
+                { text: 'Дальномер', correct: false }
+            ];
+            content = `<h3>🟡 Геодезический прибор</h3><p>Для измерения превышений используют:</p>` + this.renderShuffledButtons(opts);
         } else {
             content = `<h3>🔴 Площадь участка</h3><p>Участок 60 м × 40 м. Площадь в гектарах?</p>
                 <input type="number" id="area-input" placeholder="Площадь в га" step="0.01" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
@@ -50,6 +54,15 @@ const clusterLand = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
+    },
+
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
     },
 
     bindAnswer(container) {

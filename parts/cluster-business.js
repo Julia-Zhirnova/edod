@@ -52,17 +52,30 @@ const clusterBusiness = {
         if (el) el.textContent = text;
     },
 
+    renderShuffledButtons(options) {
+        const shuffled = shuffleArray([...options]);
+        let html = '';
+        shuffled.forEach(opt => {
+            html += `<button class="game-btn" data-correct="${opt.correct}">${opt.text}</button>`;
+        });
+        return html;
+    },
+
     renderAccountant(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Скидка</h3><p>Товар 1200₽, скидка 15%. Цена?</p>
-                <button class="game-btn" data-correct="true">1020₽</button>
-                <button class="game-btn">1185₽</button>
-                <button class="game-btn">1200₽</button>`;
+            const opts = [
+                { text: '1020₽', correct: true },
+                { text: '1185₽', correct: false },
+                { text: '1200₽', correct: false }
+            ];
+            return `<h3>🟢 Скидка</h3><p>Товар 1200₽, скидка 15%. Цена?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            return `<h3>🟡 Проводка</h3><p>Поступление товара: дебет 41, кредит?</p>
-                <button class="game-btn" data-correct="true">60</button>
-                <button class="game-btn">50</button>
-                <button class="game-btn">62</button>`;
+            const opts = [
+                { text: '60', correct: true },
+                { text: '50', correct: false },
+                { text: '62', correct: false }
+            ];
+            return `<h3>🟡 Проводка</h3><p>Поступление товара: дебет 41, кредит?</p>` + this.renderShuffledButtons(opts);
         } else {
             return `<h3>🔴 Зарплата на руки</h3>
                 <p>Оклад 25000₽, премия 20%, НДФЛ 13%.</p>
@@ -74,40 +87,52 @@ const clusterBusiness = {
 
     renderLogistics(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Срочная доставка</h3><p>Самый быстрый транспорт?</p>
-                <button class="game-btn" data-correct="true">Авиа</button>
-                <button class="game-btn">Ж/д</button>
-                <button class="game-btn">Авто</button>`;
+            const opts = [
+                { text: 'Авиа', correct: true },
+                { text: 'Ж/д', correct: false },
+                { text: 'Авто', correct: false }
+            ];
+            return `<h3>🟢 Срочная доставка</h3><p>Самый быстрый транспорт?</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            return `<h3>🟡 Транспортная задача</h3><p>Что это?</p>
-                <button class="game-btn" data-correct="true">Минимизация затрат на перевозку</button>
-                <button class="game-btn">Выбор вида транспорта</button>
-                <button class="game-btn">Расчёт времени в пути</button>`;
+            const opts = [
+                { text: 'Минимизация затрат на перевозку', correct: true },
+                { text: 'Выбор вида транспорта', correct: false },
+                { text: 'Расчёт времени в пути', correct: false }
+            ];
+            return `<h3>🟡 Транспортная задача</h3><p>Что это?</p>` + this.renderShuffledButtons(opts);
         } else {
+            const opts = [
+                { text: 'А (1000 руб.)', correct: true },
+                { text: 'Б (1050 руб.)', correct: false },
+                { text: 'Оба одинаково', correct: false }
+            ];
             return `<h3>🔴 Выбор маршрута</h3>
-                <p>Маршрут А: 200 км, 5 руб/км. Маршрут Б: 150 км, 7 руб/км. Какой дешевле?</p>
-                <button class="game-btn" data-correct="true">А (1000 руб.)</button>
-                <button class="game-btn">Б (1050 руб.)</button>
-                <button class="game-btn">Оба одинаково</button>`;
+                <p>Маршрут А: 200 км, 5 руб/км. Маршрут Б: 150 км, 7 руб/км. Какой дешевле?</p>` + this.renderShuffledButtons(opts);
         }
     },
 
     renderTrade(diff) {
         if (diff === 0) {
-            return `<h3>🟢 Конфликтный клиент</h3><p>Первая фраза:</p>
-                <button class="game-btn" data-correct="true">«Я понимаю ваше недовольство»</button>
-                <button class="game-btn">«Вы не правы»</button>
-                <button class="game-btn">«Это не моя проблема»</button>`;
+            const opts = [
+                { text: '«Я понимаю ваше недовольство»', correct: true },
+                { text: '«Вы не правы»', correct: false },
+                { text: '«Это не моя проблема»', correct: false }
+            ];
+            return `<h3>🟢 Конфликтный клиент</h3><p>Первая фраза:</p>` + this.renderShuffledButtons(opts);
         } else if (diff === 1) {
-            return `<h3>🟡 Мерчандайзинг</h3><p>Где разместить товары импульсного спроса?</p>
-                <button class="game-btn" data-correct="true">В прикассовой зоне</button>
-                <button class="game-btn">В глубине зала</button>
-                <button class="game-btn">На верхних полках</button>`;
+            const opts = [
+                { text: 'В прикассовой зоне', correct: true },
+                { text: 'В глубине зала', correct: false },
+                { text: 'На верхних полках', correct: false }
+            ];
+            return `<h3>🟡 Мерчандайзинг</h3><p>Где разместить товары импульсного спроса?</p>` + this.renderShuffledButtons(opts);
         } else {
-            return `<h3>🔴 Сдача</h3><p>Товар 350₽, дали 500₽. Сдача?</p>
-                <button class="game-btn" data-correct="true">150₽</button>
-                <button class="game-btn">100₽</button>
-                <button class="game-btn">200₽</button>`;
+            const opts = [
+                { text: '150₽', correct: true },
+                { text: '100₽', correct: false },
+                { text: '200₽', correct: false }
+            ];
+            return `<h3>🔴 Сдача</h3><p>Товар 350₽, дали 500₽. Сдача?</p>` + this.renderShuffledButtons(opts);
         }
     },
 
