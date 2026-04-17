@@ -24,7 +24,7 @@ const clusterFood = {
             content = this.renderOperator(diff);
         }
 
-        area.innerHTML = header + this.wrapStory(story) + content;
+        area.innerHTML = header + content;
         this.setReplica(story);
 
         if (specCode === '43.02.15' && diff === 2) {
@@ -45,10 +45,6 @@ const clusterFood = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
-    },
-
-    wrapStory(story) {
-        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     renderChef(diff) {

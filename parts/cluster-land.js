@@ -15,34 +15,22 @@ const clusterLand = {
         
         let content = '';
         if (diff === 0) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟢 Масштаб карты</h3>
-                <p>Масштаб 1:1000 — 1 см на карте это:</p>
+            content = `<h3>🟢 Масштаб карты</h3><p>Масштаб 1:1000 — 1 см на карте это:</p>
                 <button class="game-btn" data-correct="true">10 метров на местности</button>
                 <button class="game-btn">100 метров</button>
                 <button class="game-btn">1 км</button>
-                <button class="game-btn">1000 метров</button>
-            `;
+                <button class="game-btn">1000 метров</button>`;
         } else if (diff === 1) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟡 Геодезический прибор</h3>
-                <p>Для измерения превышений используют:</p>
+            content = `<h3>🟡 Геодезический прибор</h3><p>Для измерения превышений используют:</p>
                 <button class="game-btn" data-correct="true">Нивелир</button>
                 <button class="game-btn">Теодолит</button>
                 <button class="game-btn">Тахеометр</button>
-                <button class="game-btn">Дальномер</button>
-            `;
+                <button class="game-btn">Дальномер</button>`;
         } else {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🔴 Площадь участка</h3>
-                <p>Участок 60 м × 40 м. Площадь в гектарах?</p>
+            content = `<h3>🔴 Площадь участка</h3><p>Участок 60 м × 40 м. Площадь в гектарах?</p>
                 <input type="number" id="area-input" placeholder="Площадь в га" step="0.01" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
                 <button class="btn btn-primary" style="margin-top:15px;" id="check-area-btn">Проверить</button>
-                <p id="area-feedback"></p>
-            `;
+                <p id="area-feedback"></p>`;
         }
 
         area.innerHTML = header + content;
@@ -62,10 +50,6 @@ const clusterLand = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
-    },
-
-    wrapStory(story) {
-        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     bindAnswer(container) {

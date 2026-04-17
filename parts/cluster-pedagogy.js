@@ -12,11 +12,10 @@ const clusterPedagogy = {
         const story = diff === 0 ? 'На детской площадке фестиваля ребёнок расстроен, говорит: «У меня не получится». Как его поддержать?' :
                      diff === 1 ? 'Составь план урока для юных гостей фестиваля.' :
                      'Ученик не может сосредоточиться. Предложи педагогические приёмы.';
-        
+
         let content = '';
         if (diff === 0) {
             content = `
-                ${this.wrapStory(story)}
                 <h3>🟢 Мотивация</h3>
                 <p>Ребёнок говорит: «У меня не получится». Лучший ответ:</p>
                 <button class="game-btn" data-correct="true">«Давай попробуем вместе. Я помогу»</button>
@@ -25,18 +24,17 @@ const clusterPedagogy = {
                 <button class="game-btn">«Если не получится, ничего страшного»</button>
             `;
         } else if (diff === 1) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟡 Планирование урока</h3>
-                <p>Введи правильный порядок этапов (номера через запятую):</p>
-                <ol><li>Организационный момент</li><li>Актуализация знаний</li><li>Объяснение нового материала</li><li>Закрепление</li><li>Рефлексия</li></ol>
-                <input type="text" id="seq-input" placeholder="1,2,3,4,5" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
-                <button class="btn btn-primary" style="margin-top:15px;" id="check-seq-btn">Проверить</button>
-                <p id="seq-feedback"></p>
-            `;
+            const steps = [
+                'Организационный момент',
+                'Актуализация знаний',
+                'Объяснение нового материала',
+                'Закрепление',
+                'Рефлексия'
+            ];
+            const initialOrder = [2, 0, 4, 1, 3]; // перемешанный порядок
+            content = this.renderSortableList('seq-list-pedagogy', steps, initialOrder);
         } else {
             content = `
-                ${this.wrapStory(story)}
                 <h3>🔴 Индивидуальный подход</h3>
                 <p>Ученик постоянно отвлекается. Предложи 3 педагогических приёма (напиши кратко).</p>
                 <textarea id="methods-input" rows="4" placeholder="1. ... 2. ... 3. ..." style="width:100%; padding:10px; border-radius:8px; background:#222; color:white; border:1px solid #444;"></textarea>
@@ -48,7 +46,14 @@ const clusterPedagogy = {
         area.innerHTML = header + content;
         this.setReplica(story);
         if (diff === 1) {
-            this.initSequenceCheck();
+            this.initSortableList('seq-list-pedagogy', [0,1,2,3,4], (isCorrect) => {
+                if (isCorrect) {
+                    const spec = gameState.selectedSpecialtyCode;
+                    if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
+                    gameState.specScores[spec] += 2;
+                }
+                Cluster.gameSuccess();
+            });
         } else if (diff === 2) {
             this.initTextCheck();
         } else {
@@ -69,8 +74,86 @@ const clusterPedagogy = {
         if (el) el.textContent = text;
     },
 
-    wrapStory(story) {
-        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
+    // Универсальная функция создания сортируемого списка
+    renderSortableList(containerId, steps, initialOrder) {
+        let html = `<h3>🟡 План урока</h3><p>Расставь этапы урока в правильном порядке (используй кнопки ⬆️/⬇️):</p>`;
+        html += `<div id="${containerId}" class="sortable-list" style="margin:15px 0;">`;
+        initialOrder.forEach((stepIdx, pos) => {
+            html += `<div class="sortable-item" data-step-index="${stepIdx}" data-current-pos="${pos}">`;
+            html += `<span class="step-text">${steps[stepIdx]}</span>`;
+            html += `<div class="step-controls">`;
+            if (pos > 0) html += `<button class="step-btn step-up" data-pos="${pos}">⬆️</button>`;
+            if (pos < initialOrder.length - 1) html += `<button class="step-btn step-down" data-pos="${pos}">⬇️</button>`;
+            html += `</div></div>`;
+        });
+        html += `</div>`;
+        html += `<button class="btn btn-primary" id="check-${containerId}">Проверить</button>`;
+        html += `<p id="${containerId}-feedback" style="margin-top:10px;"></p>`;
+        return html;
+    },
+
+    initSortableList(containerId, correctOrder, onSuccess) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.addEventListener('click', (e) => {
+            const btn = e.target.closest('.step-btn');
+            if (!btn) return;
+            e.preventDefault();
+            const pos = parseInt(btn.dataset.pos);
+            const items = Array.from(container.querySelectorAll('.sortable-item'));
+            if (btn.classList.contains('step-up') && pos > 0) {
+                const prevItem = items[pos - 1];
+                const currentItem = items[pos];
+                container.insertBefore(currentItem, prevItem);
+                this.updateSortableButtons(container);
+            } else if (btn.classList.contains('step-down') && pos < items.length - 1) {
+                const nextItem = items[pos + 1];
+                const currentItem = items[pos];
+                container.insertBefore(nextItem, currentItem);
+                this.updateSortableButtons(container);
+            }
+        });
+
+        const checkBtn = document.getElementById(`check-${containerId}`);
+        const feedback = document.getElementById(`${containerId}-feedback`);
+        checkBtn.onclick = () => {
+            const items = container.querySelectorAll('.sortable-item');
+            const currentOrder = Array.from(items).map(item => parseInt(item.dataset.stepIndex));
+            const isCorrect = currentOrder.length === correctOrder.length &&
+                              currentOrder.every((val, idx) => val === correctOrder[idx]);
+            if (isCorrect) {
+                feedback.innerHTML = '✅ Правильно!';
+                if (onSuccess) onSuccess(true);
+            } else {
+                feedback.innerHTML = '❌ Порядок неверный. Попробуй ещё раз.';
+                if (onSuccess) onSuccess(false);
+            }
+        };
+
+        this.updateSortableButtons(container);
+    },
+
+    updateSortableButtons(container) {
+        const items = container.querySelectorAll('.sortable-item');
+        items.forEach((item, idx) => {
+            const controls = item.querySelector('.step-controls');
+            controls.innerHTML = '';
+            if (idx > 0) {
+                const upBtn = document.createElement('button');
+                upBtn.className = 'step-btn step-up';
+                upBtn.dataset.pos = idx;
+                upBtn.textContent = '⬆️';
+                controls.appendChild(upBtn);
+            }
+            if (idx < items.length - 1) {
+                const downBtn = document.createElement('button');
+                downBtn.className = 'step-btn step-down';
+                downBtn.dataset.pos = idx;
+                downBtn.textContent = '⬇️';
+                controls.appendChild(downBtn);
+            }
+        });
     },
 
     bindAnswer(container) {
@@ -88,22 +171,6 @@ const clusterPedagogy = {
                 Cluster.gameSuccess();
             });
         });
-    },
-
-    initSequenceCheck() {
-        document.getElementById('check-seq-btn').onclick = () => {
-            const val = document.getElementById('seq-input').value.trim();
-            const fb = document.getElementById('seq-feedback');
-            if (val === '1,2,3,4,5' || val === '1, 2, 3, 4, 5') {
-                fb.innerHTML = '✅ Правильно!';
-                const spec = gameState.selectedSpecialtyCode;
-                if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
-                gameState.specScores[spec] += 2;
-            } else {
-                fb.innerHTML = '❌ Неверно. Правильный порядок: 1,2,3,4,5';
-            }
-            Cluster.gameSuccess();
-        };
     },
 
     initTextCheck() {
@@ -125,7 +192,7 @@ const clusterPedagogy = {
     getHint(specCode, diff) {
         const hints = {
             0: { story: 'Гагарич советует: предложи помощь, не обесценивай чувства.', tip: '«Давай попробуем вместе. Я помогу»' },
-            1: { story: 'Классическая структура урока: оргмомент, актуализация, объяснение, закрепление, рефлексия.', tip: '1,2,3,4,5' },
+            1: { story: 'Классическая структура урока: оргмомент, актуализация, объяснение, закрепление, рефлексия.', tip: 'Перемести "Организационный момент" на первое место.' },
             2: { story: 'Можно менять виды деятельности, давать индивидуальные задания, хвалить за внимание.', tip: 'Напиши несколько приёмов.' }
         };
         return hints[diff];

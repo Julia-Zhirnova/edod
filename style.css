@@ -12,7 +12,12 @@
     --font: 'Segoe UI', system-ui, sans-serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* Глобальный сброс */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 body {
     background-color: var(--bg-dark);
@@ -38,7 +43,6 @@ body {
 /* --- START SCREEN --- */
 .logo-container { margin-top: 20px; margin-bottom: 20px; z-index: 10; }
 .logo { width: 150px; height: auto; filter: drop-shadow(0 0 10px var(--primary)); }
-
 .npc-container {
     display: flex;
     align-items: center;
@@ -51,22 +55,21 @@ body {
     margin-bottom: 30px;
     z-index: 10;
 }
-.npc-avatar { 
-    width: 100px; 
-    height: 100px; 
+.npc-avatar {
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--primary);
     flex-shrink: 0;
 }
-.speech-bubble { 
-    position: relative; 
-    font-size: 0.95rem; 
+.speech-bubble {
+    position: relative;
+    font-size: 0.95rem;
     line-height: 1.5;
     text-align: left;
 }
 .speech-bubble p { margin-bottom: 5px; }
-
 .start-controls {
     display: flex;
     flex-direction: column;
@@ -78,7 +81,7 @@ body {
     margin-bottom: 30px;
 }
 
-/* --- PLAYER PANEL (центрированная) --- */
+/* --- PLAYER PANEL --- */
 .player-panel-center {
     display: flex;
     align-items: center;
@@ -126,7 +129,6 @@ body {
 }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0, 212, 255, 0.6); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
 .btn-secondary {
     background: transparent;
     border: 2px solid var(--text-dim);
@@ -137,7 +139,6 @@ body {
     border-color: var(--primary);
     color: var(--primary);
 }
-
 .btn-back-top {
     position: absolute;
     top: 15px;
@@ -156,7 +157,6 @@ body {
     background: rgba(255,255,255,0.2);
     border-color: var(--primary);
 }
-
 .pulse { animation: pulse 2s infinite; }
 
 /* --- PROFILE SCREEN --- */
@@ -184,7 +184,6 @@ input:focus, textarea:focus {
     outline: none;
     border-color: var(--primary);
 }
-
 .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
 .radio-card {
     flex: 1; min-width: 120px; cursor: pointer;
@@ -194,7 +193,7 @@ input:focus, textarea:focus {
 }
 .radio-card input { display: none; }
 .radio-card:has(input:checked) {
-    border-color: var(--primary); 
+    border-color: var(--primary);
     background: rgba(0, 212, 255, 0.1);
     box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
@@ -204,10 +203,7 @@ input:focus, textarea:focus {
     align-items: center;
     gap: 5px;
 }
-.card-content small {
-    color: var(--text-dim);
-    font-size: 0.75rem;
-}
+.card-content small { color: var(--text-dim); font-size: 0.75rem; }
 .level-badge {
     background: var(--primary);
     color: var(--bg-dark);
@@ -219,16 +215,16 @@ input:focus, textarea:focus {
 
 /* --- AVATARS --- */
 .avatar-grid {
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
 }
 .avatar-item {
     width: 100%;
     aspect-ratio: 1;
-    border: 3px solid transparent; 
+    border: 3px solid transparent;
     border-radius: var(--radius);
-    cursor: pointer; 
+    cursor: pointer;
     transition: 0.2s;
     overflow: hidden;
     background: var(--bg-card);
@@ -236,13 +232,9 @@ input:focus, textarea:focus {
     align-items: center;
     justify-content: center;
 }
-.avatar-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.avatar-item.selected { 
-    border-color: var(--accent); 
+.avatar-item img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-item.selected {
+    border-color: var(--accent);
     background: rgba(255, 0, 85, 0.1);
     box-shadow: 0 0 15px rgba(255, 0, 85, 0.5);
     transform: scale(1.05);
@@ -254,13 +246,13 @@ input:focus, textarea:focus {
 
 /* --- GAME UI --- */
 .location-header {
-    width: 100%; 
+    width: 100%;
     max-width: 600px;
-    display: flex; 
-    justify-content: space-between; 
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 12px 16px; 
-    background: var(--bg-card); 
+    padding: 12px 16px;
+    background: var(--bg-card);
     border-radius: var(--radius);
     margin: 20px 0;
     border: 1px solid #333;
@@ -268,29 +260,28 @@ input:focus, textarea:focus {
 .loc-id { font-size: 0.85rem; color: var(--text-dim); }
 .timer-container { display: flex; align-items: center; gap: 10px; }
 .timer-bar {
-    width: 60px; 
-    height: 6px; 
-    background: #333; 
-    border-radius: 3px; 
+    width: 60px;
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
     overflow: hidden;
 }
-.timer-bar-fill { 
-    height: 100%; 
-    background: var(--success); 
-    width: 100%; 
-    transition: width 1s linear; 
+.timer-bar-fill {
+    height: 100%;
+    background: var(--success);
+    width: 100%;
+    transition: width 1s linear;
 }
 .timer-bar-fill.warning { background: var(--warning); }
 .timer-bar-fill.danger { background: var(--accent); }
-
 .game-area {
-    width: 100%; 
-    max-width: 600px; 
+    width: 100%;
+    max-width: 600px;
     margin: 0 auto;
-    min-height: 350px; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     padding: 25px;
     background: var(--bg-card);
@@ -314,22 +305,18 @@ input:focus, textarea:focus {
     position: relative;
     z-index: 1;
 }
-
 .game-area h3 {
     margin-bottom: 10px;
     color: var(--primary);
     text-align: center;
     font-size: 1.1rem;
 }
-
 .game-area p {
     margin-bottom: 20px;
     text-align: center;
     line-height: 1.5;
     color: var(--text-dim);
 }
-
-/* --- STATIC CODE BLOCK --- */
 .game-area pre {
     background: #1e1e1e;
     color: #d4d4d4;
@@ -345,12 +332,7 @@ input:focus, textarea:focus {
     white-space: pre-wrap;
     word-break: break-all;
 }
-
-.game-area pre code {
-    background: transparent;
-    padding: 0;
-    color: inherit;
-}
+.game-area pre code { background: transparent; padding: 0; color: inherit; }
 
 /* --- GAME BUTTONS --- */
 .game-btn {
@@ -366,10 +348,7 @@ input:focus, textarea:focus {
     transition: all 0.2s;
     text-align: center;
 }
-.game-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-}
+.game-btn:hover { border-color: var(--primary); color: var(--primary); }
 .game-btn.selected {
     border-color: var(--primary);
     background: rgba(0, 212, 255, 0.15);
@@ -406,7 +385,6 @@ input:focus, textarea:focus {
     margin: 10px 0;
 }
 .progress-text { color: var(--text-dim); font-size: 0.9rem; }
-
 .map-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -433,9 +411,7 @@ input:focus, textarea:focus {
 .map-node-desc { font-size: 0.8rem; color: var(--text-dim); display: block; }
 
 /* --- CLUSTER SCREEN --- */
-#screen-cluster {
-    padding-top: 70px;
-}
+#screen-cluster { padding-top: 70px; }
 .cluster-header {
     width: 100%;
     max-width: 600px;
@@ -444,13 +420,7 @@ input:focus, textarea:focus {
     justify-content: space-between;
     align-items: center;
 }
-#cluster-title {
-    font-size: 1.2rem;
-    color: var(--primary);
-    margin: 0;
-    flex: 1;
-    text-align: center;
-}
+#cluster-title { font-size: 1.2rem; color: var(--primary); margin: 0; flex: 1; text-align: center; }
 
 /* --- SPECIALTY OPTIONS --- */
 .specialty-options-container {
@@ -473,39 +443,31 @@ input:focus, textarea:focus {
 
 /* --- MODALS --- */
 .modal {
-    display: none; 
-    position: fixed; 
-    top: 0; left: 0; 
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); 
-    z-index: 1000; 
-    align-items: center; 
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    align-items: center;
     justify-content: center;
     padding: 20px;
 }
 .modal.active { display: flex; }
 .modal-content {
-    background: var(--bg-card); 
-    padding: 30px; 
+    background: var(--bg-card);
+    padding: 30px;
     border-radius: var(--radius);
-    max-width: 400px; 
+    max-width: 400px;
     width: 100%;
-    text-align: center; 
+    text-align: center;
     border: 2px solid var(--primary);
     position: relative;
     box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
 }
 .modal-content.warning { border-color: var(--warning); }
-.modal-content h3 {
-    margin-bottom: 15px;
-    color: var(--primary);
-    font-size: 1.1rem;
-}
-.modal-content p {
-    margin-bottom: 20px;
-    line-height: 1.5;
-    font-size: 0.95rem;
-}
+.modal-content h3 { margin-bottom: 15px; color: var(--primary); font-size: 1.1rem; }
+.modal-content p { margin-bottom: 20px; line-height: 1.5; font-size: 0.95rem; }
 .hint-story {
     background: rgba(0, 212, 255, 0.08);
     border-left: 3px solid var(--primary);
@@ -521,14 +483,10 @@ input:focus, textarea:focus {
 }
 .close {
     position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: 0.2s;
-    line-height: 1;
+    top: 10px; right: 15px;
+    font-size: 28px; font-weight: bold;
+    color: var(--text-dim); cursor: pointer;
+    transition: 0.2s; line-height: 1;
 }
 .close:hover { color: var(--accent); }
 
@@ -559,11 +517,6 @@ input:focus, textarea:focus {
     border-radius: 20px;
     margin: 8px 0;
 }
-.professionalet-badge {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-}
 .professionalet-text {
     font-size: 0.75rem;
     font-weight: bold;
@@ -572,14 +525,14 @@ input:focus, textarea:focus {
 }
 
 /* --- ANIMATIONS --- */
-@keyframes fadeIn { 
-    from { opacity: 0; transform: translateY(10px); } 
-    to { opacity: 1; transform: translateY(0); } 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-@keyframes pulse { 
-    0% { transform: scale(1); } 
-    50% { transform: scale(1.02); } 
-    100% { transform: scale(1); } 
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
 }
 
 /* --- MOBILE --- */

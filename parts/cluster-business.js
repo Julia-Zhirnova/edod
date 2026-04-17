@@ -29,7 +29,7 @@ const clusterBusiness = {
             content = this.renderTrade(diff);
         }
 
-        area.innerHTML = header + this.wrapStory(story) + content;
+        area.innerHTML = header + content;
         this.setReplica(story);
 
         if (specCode === '38.02.01' && diff === 2) {
@@ -50,10 +50,6 @@ const clusterBusiness = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
-    },
-
-    wrapStory(story) {
-        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     renderAccountant(diff) {

@@ -21,7 +21,7 @@ const clusterIt = {
 
     getHeader() {
         return `<div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-            <img src="media/images/npc-gagarich.png" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary);" onerror="this.src='data:image/svg+xml,...'">
+            <img src="media/images/npc-gagarich.png" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary);" onerror="this.src='image/svg+xml,...'">
             <span style="color:var(--primary); font-weight:bold;">Гагарич:</span>
             <span id="gagarich-replica" style="color:var(--text-dim);"></span>
         </div>`;
@@ -32,10 +32,6 @@ const clusterIt = {
         if (el) el.textContent = text;
     },
 
-    wrapStory(story) {
-        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
-    },
-
     renderNetworkAdmin(area, header, diff) {
         const story = diff === 0 ? 'Сервер фестиваля упал! Гости не могут зарегистрироваться. Нужно срочно найти причину.' :
                      diff === 1 ? 'Служба веб-сервера не отвечает. Надо её перезапустить.' :
@@ -43,48 +39,24 @@ const clusterIt = {
         
         let content = '';
         if (diff === 0) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟢 Диагностика сервера</h3>
-                <p>Какая команда покажет статус службы веб-сервера?</p>
+            content = `<h3>🟢 Диагностика сервера</h3><p>Какая команда покажет статус службы веб-сервера?</p>
                 <button class="game-btn" data-correct="true">systemctl status nginx</button>
                 <button class="game-btn">ping 127.0.0.1</button>
                 <button class="game-btn">ls -la /var/www</button>
-                <button class="game-btn">netstat -tulpn</button>
-            `;
+                <button class="game-btn">netstat -tulpn</button>`;
         } else if (diff === 1) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟡 Перезапуск службы</h3>
-                <p>Как перезапустить веб-сервер nginx?</p>
+            content = `<h3>🟡 Перезапуск службы</h3><p>Как перезапустить веб-сервер nginx?</p>
                 <button class="game-btn" data-correct="true">systemctl restart nginx</button>
                 <button class="game-btn">service nginx start</button>
                 <button class="game-btn">killall nginx</button>
-                <button class="game-btn">nginx -s reload</button>
-            `;
+                <button class="game-btn">nginx -s reload</button>`;
         } else {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🔴 Допиши недостающую строку в скрипте</h3>
+            content = `<h3>🔴 Допиши недостающую строку в скрипте</h3>
                 <p>Скрипт проверки доступности сайта. Вставь пропущенную строку, которая выполняет HTTP-запрос.</p>
-                <pre style="background:#1e1e1e; color:#d4d4d4; padding:15px; border-radius:8px; overflow-x:auto; font-family:monospace; font-size:14px; text-align:left;">
-#!/bin/bash
-URL="http://festival.local"
-
-# --- Вставь недостающую строку ниже ---
-<span id="code-placeholder" style="background:#2d2d2d; display:inline-block; width:100%; padding:4px 0;">&nbsp;</span>
-# --- Конец вставки ---
-
-if [ $? -eq 0 ] && [ "$http_code" -eq 200 ]; then
-    echo "OK"
-else
-    echo "FAIL"
-fi
-                </pre>
+                <pre style="background:#1e1e1e; color:#d4d4d4; padding:15px; border-radius:8px; overflow-x:auto; font-family:monospace; font-size:14px; text-align:left;">#!/bin/bash\nURL="http://festival.local"\n# --- Вставь недостающую строку ниже ---\n&nbsp;\n# --- Конец вставки ---\nif [ $? -eq 0 ] && [ "$http_code" -eq 200 ]; then\n    echo "OK"\nelse\n    echo "FAIL"\nfi</pre>
                 <input type="text" id="code-input" placeholder="Введи недостающую строку" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444; margin-top:15px;">
                 <button class="btn btn-primary" style="margin-top:15px;" id="check-code-btn">Проверить</button>
-                <p id="code-feedback"></p>
-            `;
+                <p id="code-feedback"></p>`;
         }
 
         area.innerHTML = header + content;
@@ -100,35 +72,23 @@ fi
         
         let content = '';
         if (diff === 0) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟢 HTML-форма отзыва</h3>
-                <p>Какой тег создаёт поле для ввода email?</p>
+            content = `<h3>🟢 HTML-форма отзыва</h3><p>Какой тег создаёт поле для ввода email?</p>
                 <button class="game-btn" data-correct="true">&lt;input type="email"&gt;</button>
                 <button class="game-btn">&lt;input type="text"&gt;</button>
                 <button class="game-btn">&lt;textarea&gt;</button>
-                <button class="game-btn">&lt;form&gt;</button>
-            `;
+                <button class="game-btn">&lt;form&gt;</button>`;
         } else if (diff === 1) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟡 Валидация email (JavaScript)</h3>
-                <p>Какое регулярное выражение проверит email?</p>
+            content = `<h3>🟡 Валидация email (JavaScript)</h3><p>Какое регулярное выражение проверит email?</p>
                 <button class="game-btn" data-correct="true">/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/</button>
                 <button class="game-btn">/.*@.*/</button>
                 <button class="game-btn">/^\\d+@\\d+\\.\\d+$/</button>
-                <button class="game-btn">/[A-Za-z]+@[A-Za-z]+\\.[A-Za-z]{2,}/</button>
-            `;
+                <button class="game-btn">/[A-Za-z]+@[A-Za-z]+\\.[A-Za-z]{2,}/</button>`;
         } else {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🔴 Сохранение отзыва</h3>
-                <p>Какой метод сохранит отзыв в localStorage?</p>
+            content = `<h3>🔴 Сохранение отзыва</h3><p>Какой метод сохранит отзыв в localStorage?</p>
                 <button class="game-btn" data-correct="true">localStorage.setItem('review', text)</button>
                 <button class="game-btn">sessionStorage.save('review', text)</button>
                 <button class="game-btn">document.cookie = 'review='+text</button>
-                <button class="game-btn">localStorage.save('review', text)</button>
-            `;
+                <button class="game-btn">localStorage.save('review', text)</button>`;
         }
 
         area.innerHTML = header + content;
@@ -143,35 +103,23 @@ fi
         
         let content = '';
         if (diff === 0) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟢 SQL-инъекция</h3>
-                <p>Какой из запросов уязвим для инъекции?</p>
+            content = `<h3>🟢 SQL-инъекция</h3><p>Какой из запросов уязвим для инъекции?</p>
                 <button class="game-btn" data-correct="true">"SELECT * FROM users WHERE name = '" + name + "'"</button>
                 <button class="game-btn">"SELECT * FROM users WHERE name = ?"</button>
                 <button class="game-btn">"SELECT * FROM users WHERE name = $1"</button>
-                <button class="game-btn">"SELECT * FROM users WHERE name = :name"</button>
-            `;
+                <button class="game-btn">"SELECT * FROM users WHERE name = :name"</button>`;
         } else if (diff === 1) {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🟡 Восстановление из бэкапа</h3>
-                <p>Какая команда восстановит базу MySQL из дампа?</p>
+            content = `<h3>🟡 Восстановление из бэкапа</h3><p>Какая команда восстановит базу MySQL из дампа?</p>
                 <button class="game-btn" data-correct="true">mysql -u root -p dbname < backup.sql</button>
                 <button class="game-btn">mysqldump dbname > backup.sql</button>
                 <button class="game-btn">pg_restore -d dbname backup.dump</button>
-                <button class="game-btn">mongoimport --db dbname backup.json</button>
-            `;
+                <button class="game-btn">mongoimport --db dbname backup.json</button>`;
         } else {
-            content = `
-                ${this.wrapStory(story)}
-                <h3>🔴 Настройка iptables</h3>
-                <p>Какое правило заблокирует IP 192.168.1.100?</p>
+            content = `<h3>🔴 Настройка iptables</h3><p>Какое правило заблокирует IP 192.168.1.100?</p>
                 <button class="game-btn" data-correct="true">iptables -A INPUT -s 192.168.1.100 -j DROP</button>
                 <button class="game-btn">iptables -A OUTPUT -d 192.168.1.100 -j REJECT</button>
                 <button class="game-btn">iptables -D INPUT -s 192.168.1.100 -j DROP</button>
-                <button class="game-btn">iptables -I FORWARD -s 192.168.1.100 -j DROP</button>
-            `;
+                <button class="game-btn">iptables -I FORWARD -s 192.168.1.100 -j DROP</button>`;
         }
 
         area.innerHTML = header + content;
@@ -202,7 +150,7 @@ fi
         document.getElementById('check-code-btn').onclick = () => {
             const input = document.getElementById('code-input').value.trim();
             const fb = document.getElementById('code-feedback');
-            if (input === expected || input === 'http_code=$(curl -s -o /dev/null -w "%{http_code}" $URL)') {
+            if (input === expected || input.includes('curl') && input.includes('http_code')) {
                 fb.innerHTML = '✅ Правильно!';
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
@@ -233,7 +181,7 @@ fi
                 2: { story: 'iptables — мощный инструмент фильтрации пакетов.', tip: 'iptables -A INPUT -s IP -j DROP' }
             }
         };
-        return hints[specCode][diff] || { story: 'Подумай логически.', tip: 'Попробуй ещё раз!' };
+        return hints[specCode]?.[diff] || { story: 'Подумай логически.', tip: 'Попробуй ещё раз!' };
     }
 };
 

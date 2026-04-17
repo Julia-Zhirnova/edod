@@ -24,11 +24,19 @@ const clusterLaw = {
             content = this.renderDocument(diff);
         }
 
-        area.innerHTML = header + this.wrapStory(story) + content;
+        area.innerHTML = header + content;
         this.setReplica(story);
 
         if (specCode === '46.02.01' && diff === 2) {
-            this.initSequenceCheck();
+            // Для документоведа используем сортировку
+            this.initSortableList('seq-list-law', [0,1,2,3], (isCorrect) => {
+                if (isCorrect) {
+                    const spec = gameState.selectedSpecialtyCode;
+                    if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
+                    gameState.specScores[spec] += 3;
+                }
+                Cluster.gameSuccess();
+            });
         } else {
             this.bindAnswer(area);
         }
@@ -45,10 +53,6 @@ const clusterLaw = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
-    },
-
-    wrapStory(story) {
-        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     renderJurist(diff) {
@@ -82,13 +86,97 @@ const clusterLaw = {
                 <button class="game-btn">Гражданский кодекс</button>
                 <button class="game-btn">Уголовный кодекс</button>`;
         } else {
-            return `<h3>🔴 Реквизиты приказа</h3>
-                <p>Введи правильный порядок номеров через запятую:</p>
-                <ol><li>Дата</li><li>Номер</li><li>Заголовок</li><li>Текст</li></ol>
-                <input type="text" id="seq-input" placeholder="1,2,3,4" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
-                <button class="btn btn-primary" style="margin-top:15px;" id="check-seq-btn">Проверить</button>
-                <p id="seq-feedback"></p>`;
+            const steps = [
+                'Дата',
+                'Номер',
+                'Заголовок',
+                'Текст'
+            ];
+            const initialOrder = [2, 0, 3, 1]; // перемешанный порядок
+            return this.renderSortableList('seq-list-law', steps, initialOrder);
         }
+    },
+
+    // Универсальная функция создания сортируемого списка
+    renderSortableList(containerId, steps, initialOrder) {
+        let html = `<h3>🔴 Реквизиты приказа</h3><p>Расставь реквизиты в правильном порядке (используй кнопки ⬆️/⬇️):</p>`;
+        html += `<div id="${containerId}" class="sortable-list" style="margin:15px 0;">`;
+        initialOrder.forEach((stepIdx, pos) => {
+            html += `<div class="sortable-item" data-step-index="${stepIdx}" data-current-pos="${pos}">`;
+            html += `<span class="step-text">${steps[stepIdx]}</span>`;
+            html += `<div class="step-controls">`;
+            if (pos > 0) html += `<button class="step-btn step-up" data-pos="${pos}">⬆️</button>`;
+            if (pos < initialOrder.length - 1) html += `<button class="step-btn step-down" data-pos="${pos}">⬇️</button>`;
+            html += `</div></div>`;
+        });
+        html += `</div>`;
+        html += `<button class="btn btn-primary" id="check-${containerId}">Проверить</button>`;
+        html += `<p id="${containerId}-feedback" style="margin-top:10px;"></p>`;
+        return html;
+    },
+
+    initSortableList(containerId, correctOrder, onSuccess) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.addEventListener('click', (e) => {
+            const btn = e.target.closest('.step-btn');
+            if (!btn) return;
+            e.preventDefault();
+            const pos = parseInt(btn.dataset.pos);
+            const items = Array.from(container.querySelectorAll('.sortable-item'));
+            if (btn.classList.contains('step-up') && pos > 0) {
+                const prevItem = items[pos - 1];
+                const currentItem = items[pos];
+                container.insertBefore(currentItem, prevItem);
+                this.updateSortableButtons(container);
+            } else if (btn.classList.contains('step-down') && pos < items.length - 1) {
+                const nextItem = items[pos + 1];
+                const currentItem = items[pos];
+                container.insertBefore(nextItem, currentItem);
+                this.updateSortableButtons(container);
+            }
+        });
+
+        const checkBtn = document.getElementById(`check-${containerId}`);
+        const feedback = document.getElementById(`${containerId}-feedback`);
+        checkBtn.onclick = () => {
+            const items = container.querySelectorAll('.sortable-item');
+            const currentOrder = Array.from(items).map(item => parseInt(item.dataset.stepIndex));
+            const isCorrect = currentOrder.length === correctOrder.length &&
+                              currentOrder.every((val, idx) => val === correctOrder[idx]);
+            if (isCorrect) {
+                feedback.innerHTML = '✅ Правильно!';
+                if (onSuccess) onSuccess(true);
+            } else {
+                feedback.innerHTML = '❌ Порядок неверный. Попробуй ещё раз.';
+                if (onSuccess) onSuccess(false);
+            }
+        };
+
+        this.updateSortableButtons(container);
+    },
+
+    updateSortableButtons(container) {
+        const items = container.querySelectorAll('.sortable-item');
+        items.forEach((item, idx) => {
+            const controls = item.querySelector('.step-controls');
+            controls.innerHTML = '';
+            if (idx > 0) {
+                const upBtn = document.createElement('button');
+                upBtn.className = 'step-btn step-up';
+                upBtn.dataset.pos = idx;
+                upBtn.textContent = '⬆️';
+                controls.appendChild(upBtn);
+            }
+            if (idx < items.length - 1) {
+                const downBtn = document.createElement('button');
+                downBtn.className = 'step-btn step-down';
+                downBtn.dataset.pos = idx;
+                downBtn.textContent = '⬇️';
+                controls.appendChild(downBtn);
+            }
+        });
     },
 
     bindAnswer(container) {
@@ -108,22 +196,6 @@ const clusterLaw = {
         });
     },
 
-    initSequenceCheck() {
-        document.getElementById('check-seq-btn').onclick = () => {
-            const val = document.getElementById('seq-input').value.trim();
-            const fb = document.getElementById('seq-feedback');
-            if (val === '1,2,3,4' || val === '1, 2, 3, 4') {
-                fb.innerHTML = '✅ Правильно!';
-                const spec = gameState.selectedSpecialtyCode;
-                if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
-                gameState.specScores[spec] += 3;
-            } else {
-                fb.innerHTML = '❌ Неверно. Правильный порядок: 1,2,3,4';
-            }
-            Cluster.gameSuccess();
-        };
-    },
-
     getHint(specCode, diff) {
         const hints = {
             '40.02.04': {
@@ -134,7 +206,7 @@ const clusterLaw = {
             '46.02.01': {
                 0: { story: 'Личные дела хранятся 75 лет.', tip: '75 лет' },
                 1: { story: 'Конституция — основной закон.', tip: 'Конституция' },
-                2: { story: 'Приказ: дата, номер, заголовок, текст.', tip: '1,2,3,4' }
+                2: { story: 'Приказ: дата, номер, заголовок, текст.', tip: 'Перемести "Дата" на первое место.' }
             }
         };
         return hints[specCode]?.[diff] || { story: 'Подумай логически.', tip: 'Попробуй ещё раз.' };

@@ -42,7 +42,7 @@ const clusterChem = {
             `;
         }
 
-        area.innerHTML = header + this.wrapStory(story) + content;
+        area.innerHTML = header + content;
         this.setReplica(story);
         if (diff < 2) this.bindAnswer(area);
         else this.initMassCheck();
@@ -59,10 +59,6 @@ const clusterChem = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
-    },
-
-    wrapStory(story) {
-        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     bindAnswer(container) {

@@ -12,11 +12,10 @@ const clusterZhk = {
         const story = diff === 0 ? 'В павильоне фестиваля потёк кран. Какой прибор учёта воды установлен?' :
                      diff === 1 ? 'Как подготовить дом к зиме?' :
                      'Рассчитай плату за ОДН по электроэнергии.';
-        
+
         let content = '';
         if (diff === 0) {
             content = `
-                ${this.wrapStory(story)}
                 <h3>🟢 Прибор учёта воды</h3>
                 <p>Какой счётчик измеряет расход горячей воды?</p>
                 <button class="game-btn" data-correct="true">Тахометрический счётчик воды</button>
@@ -26,7 +25,6 @@ const clusterZhk = {
             `;
         } else if (diff === 1) {
             content = `
-                ${this.wrapStory(story)}
                 <h3>🟡 Подготовка к зиме</h3>
                 <p>Что обязательно для подготовки дома к отопительному сезону?</p>
                 <button class="game-btn" data-correct="true">Промывка и опрессовка системы отопления</button>
@@ -36,7 +34,6 @@ const clusterZhk = {
             `;
         } else {
             content = `
-                ${this.wrapStory(story)}
                 <h3>🔴 Расчёт ОДН (электроэнергия)</h3>
                 <p>ОДПУ: 5000 кВт·ч, сумма квартирных: 4200 кВт·ч. S квартиры 60 м², S дома 3000 м². Тариф 4 руб/кВт·ч. Сколько ОДН для квартиры (руб)?</p>
                 <input type="number" id="odn-input" placeholder="Сумма в рублях" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
@@ -65,10 +62,6 @@ const clusterZhk = {
     setReplica(text) {
         const el = document.getElementById('gagarich-replica');
         if (el) el.textContent = text;
-    },
-
-    wrapStory(story) {
-        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     bindAnswer(container) {
