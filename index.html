@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Фестиваль профессий | Люберецкий техникум</title>
     <link rel="stylesheet" href="style.css">
-    <!-- CodeMirror для редактора кода -->
+    <!-- CodeMirror -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
 </head>
@@ -28,13 +28,9 @@
             </div>
             
             <div class="start-controls">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="save-progress" checked>
-                    <span class="checkmark"></span>
-                    Сохранять прогресс
-                </label>
                 <button class="btn btn-primary pulse" onclick="App.startGame()">Начать приключение →</button>
             </div>
+            <p style="color: var(--text-dim); margin-top: 20px;">12 кластеров, 25 профессий — найди свою!</p>
         </div>
 
         <!-- ЭКРАН 2: ПРОФИЛЬ -->
@@ -89,7 +85,7 @@
         <div id="screen-intro" class="screen">
             <button class="btn-back-top" onclick="App.showScreen('screen-profile')">← Назад</button>
             
-            <div class="player-panel" id="player-panel-intro">
+            <div class="player-panel-center" id="player-panel-intro">
                 <img src="" alt="Аватар" class="player-avatar" id="player-avatar-intro"
                      onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%2300d4ff%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 font-size=%2216%22%3E👤%3C/text%3E%3C/svg%3E'">
                 <span class="player-name" id="player-name-intro"></span>
@@ -115,12 +111,13 @@
         <div id="screen-map" class="screen">
             <button class="btn-back-top" onclick="App.showScreen('screen-intro')">← Назад</button>
             
+            <div class="player-panel-center" id="player-panel-map">
+                <img src="" alt="Аватар" class="player-avatar" id="map-avatar"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%2300d4ff%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 font-size=%2216%22%3E👤%3C/text%3E%3C/svg%3E'">
+                <span class="player-name" id="map-name"></span>
+            </div>
+            
             <div class="map-header">
-                <div class="player-panel-mini">
-                    <img src="" alt="Аватар" class="mini-avatar" id="map-avatar"
-                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2230%22 height=%2230%22%3E%3Ccircle cx=%2215%22 cy=%2215%22 r=%2215%22 fill=%22%2300d4ff%22/%3E%3Ctext x=%2215%22 y=%2220%22 text-anchor=%22middle%22 font-size=%2212%22%3E👤%3C/text%3E%3C/svg%3E'">
-                    <span class="player-name" id="map-name"></span>
-                </div>
                 <div class="progress-text">
                     Пройдено: <span id="map-progress-count">0/12</span>
                 </div>
@@ -138,6 +135,12 @@
         <div id="screen-cluster" class="screen">
             <button class="btn-back-top" onclick="Cluster.goBackToMap()">← На карту</button>
             
+            <div class="player-panel-center" id="player-panel-cluster">
+                <img src="" alt="Аватар" class="player-avatar" id="cluster-avatar"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%2300d4ff%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 font-size=%2216%22%3E👤%3C/text%3E%3C/svg%3E'">
+                <span class="player-name" id="cluster-name"></span>
+            </div>
+            
             <div class="cluster-header">
                 <h2 id="cluster-title">💻 IT & Кибербез</h2>
                 <div class="timer-container">
@@ -154,13 +157,10 @@
             </div>
         </div>
 
-        <!-- ЭКРАН 6: ФИНАЛ / РЕЗУЛЬТАТЫ -->
-        <div id="screen-final" class="screen">
-            <!-- Заполняется динамически из Final.show() -->
-        </div>
+        <!-- ЭКРАН 6: ФИНАЛ (заполняется динамически) -->
+        <div id="screen-final" class="screen"></div>
 
         <!-- МОДАЛЬНЫЕ ОКНА -->
-        <!-- Подсказка -->
         <div id="modal-hint" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="UI.closeHint()">&times;</span>
@@ -171,7 +171,6 @@
             </div>
         </div>
 
-        <!-- Таймаут -->
         <div id="modal-timeout" class="modal">
             <div class="modal-content warning">
                 <h3>⏰ Время вышло!</h3>
@@ -180,7 +179,6 @@
             </div>
         </div>
 
-        <!-- Выбор специальности в кластере -->
         <div id="modal-specialty" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="Cluster.closeSpecialtyModal()">&times;</span>
@@ -195,15 +193,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/powershell/powershell.min.js"></script>
-    
-    <!-- Основной скрипт игры и части -->
+
+    <!-- 12 модулей кластеров -->
+    <script src="parts/cluster-it.js"></script>
+    <script src="parts/cluster-avia.js"></script>
+    <script src="parts/cluster-chem.js"></script>
+    <script src="parts/cluster-auto.js"></script>
+    <script src="parts/cluster-business.js"></script>
+    <script src="parts/cluster-law.js"></script>
+    <script src="parts/cluster-pedagogy.js"></script>
+    <script src="parts/cluster-food.js"></script>
+    <script src="parts/cluster-design.js"></script>
+    <script src="parts/cluster-safety.js"></script>
+    <script src="parts/cluster-land.js"></script>
+    <script src="parts/cluster-zhk.js"></script>
+
+    <!-- Ядро игры -->
     <script src="script.js"></script>
-    <script src="parts/part1-intro.js"></script>
-    <script src="parts/part2-map-clusters.js"></script>
-    <script src="parts/part3-clusters5-8.js"></script>
-    <script src="parts/part4-final.js"></script>
 </body>
 </html>
