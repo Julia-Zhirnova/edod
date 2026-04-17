@@ -310,7 +310,7 @@ input:focus, textarea:focus {
     border-radius: var(--radius);
     z-index: -1;
 }
-.game-area h3, .game-area p, .game-area button, .game-area input, .game-area textarea, .game-area ol, .game-area label {
+.game-area h3, .game-area p, .game-area button, .game-area input, .game-area textarea, .game-area ol, .game-area label, .game-area pre {
     position: relative;
     z-index: 1;
 }
@@ -327,6 +327,29 @@ input:focus, textarea:focus {
     text-align: center;
     line-height: 1.5;
     color: var(--text-dim);
+}
+
+/* --- STATIC CODE BLOCK --- */
+.game-area pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+    margin: 15px 0;
+    border: 1px solid #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.game-area pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
 }
 
 /* --- GAME BUTTONS --- */
@@ -446,20 +469,6 @@ input:focus, textarea:focus {
 .specialty-option.completed-specialty {
     border-color: var(--success);
     background: rgba(0, 255, 136, 0.1);
-}
-
-/* --- CODE EDITOR --- */
-.code-editor-container {
-    width: 100%; text-align: left; margin-top: 10px;
-}
-.CodeMirror {
-    border-radius: 8px; font-size: 14px; height: 200px;
-    border: 1px solid #444;
-}
-.check-code-btn {
-    margin-top: 10px; width: 100%;
-    background: var(--secondary); color: white;
-    border: none; padding: 10px; border-radius: 8px; cursor: pointer;
 }
 
 /* --- MODALS --- */

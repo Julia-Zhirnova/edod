@@ -9,17 +9,44 @@ const clusterSafety = {
         if (gameArea) gameArea.style.backgroundImage = "url('media/images/cluster-safety-bg.jpg')";
 
         const header = this.getHeader();
-        let story = '';
+        const story = diff === 0 ? 'На фестивале задымился электроприбор. Чем будем тушить?' :
+                     diff === 1 ? 'Расставь действия при пожаре по порядку.' :
+                     'Рассчитай время эвакуации из павильона.';
+        
         let content = '';
+        if (diff === 0) {
+            content = `
+                ${this.wrapStory(story)}
+                <h3>🟢 Выбор огнетушителя</h3>
+                <p>Каким тушить электроустановки под напряжением?</p>
+                <button class="game-btn" data-correct="true">Углекислотным (ОУ)</button>
+                <button class="game-btn">Пенным (ОХП)</button>
+                <button class="game-btn">Водным (ОВ)</button>
+                <button class="game-btn">Порошковым (любым)</button>
+            `;
+        } else if (diff === 1) {
+            content = `
+                ${this.wrapStory(story)}
+                <h3>🟡 Порядок действий</h3>
+                <p>Введи номера через запятую:</p>
+                <ol><li>Сообщить в пожарную охрану</li><li>Эвакуировать людей</li><li>Приступить к тушению (если безопасно)</li><li>Встретить пожарных</li></ol>
+                <input type="text" id="seq-input" placeholder="1,2,3,4" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
+                <button class="btn btn-primary" style="margin-top:15px;" id="check-seq-btn">Проверить</button>
+                <p id="seq-feedback"></p>
+            `;
+        } else {
+            content = `
+                ${this.wrapStory(story)}
+                <h3>🔴 Расчёт времени эвакуации</h3>
+                <p>Длина пути 40 м, скорость 16 м/мин. Сколько минут?</p>
+                <input type="number" id="time-input" placeholder="Минуты" step="0.1" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
+                <button class="btn btn-primary" style="margin-top:15px;" id="check-time-btn">Проверить</button>
+                <p id="time-feedback"></p>
+            `;
+        }
 
-        story = diff === 0 ? 'На фестивале задымился электроприбор. Чем будем тушить?' :
-               diff === 1 ? 'Расставь действия при пожаре по порядку.' :
-               'Рассчитай время эвакуации из павильона.';
-        content = this.renderContent(diff);
-
-        area.innerHTML = header + this.wrapStory(story) + content;
+        area.innerHTML = header + content;
         this.setReplica(story);
-
         if (diff === 1) {
             this.initSequenceCheck();
         } else if (diff === 2) {
@@ -43,33 +70,7 @@ const clusterSafety = {
     },
 
     wrapStory(story) {
-        return `<div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-            <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-        </div>`;
-    },
-
-    renderContent(diff) {
-        if (diff === 0) {
-            return `<h3>🟢 Выбор огнетушителя</h3>
-                <p>Каким тушить электроустановки под напряжением?</p>
-                <button class="game-btn" data-correct="true">Углекислотным (ОУ)</button>
-                <button class="game-btn">Пенным (ОХП)</button>
-                <button class="game-btn">Водным (ОВ)</button>
-                <button class="game-btn">Порошковым (любым)</button>`;
-        } else if (diff === 1) {
-            return `<h3>🟡 Порядок действий</h3>
-                <p>Введи номера через запятую:</p>
-                <ol><li>Сообщить в пожарную охрану</li><li>Эвакуировать людей</li><li>Приступить к тушению (если безопасно)</li><li>Встретить пожарных</li></ol>
-                <input type="text" id="seq-input" placeholder="1,2,3,4" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
-                <button class="btn btn-primary" style="margin-top:15px;" id="check-seq-btn">Проверить</button>
-                <p id="seq-feedback"></p>`;
-        } else {
-            return `<h3>🔴 Расчёт времени эвакуации</h3>
-                <p>Длина пути 40 м, скорость 16 м/мин. Сколько минут?</p>
-                <input type="number" id="time-input" placeholder="Минуты" step="0.1" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
-                <button class="btn btn-primary" style="margin-top:15px;" id="check-time-btn">Проверить</button>
-                <p id="time-feedback"></p>`;
-        }
+        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     bindAnswer(container) {
@@ -77,7 +78,6 @@ const clusterSafety = {
             btn.addEventListener('click', () => {
                 if (btn.dataset.correct === 'true') {
                     btn.classList.add('correct');
-                    gameState.psych.practical += 2;
                     const spec = gameState.selectedSpecialtyCode;
                     if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                     gameState.specScores[spec] += 2;
@@ -96,7 +96,6 @@ const clusterSafety = {
             const fb = document.getElementById('seq-feedback');
             if (val === '1,2,3,4' || val === '1, 2, 3, 4') {
                 fb.innerHTML = '✅ Правильно!';
-                gameState.psych.org += 2;
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                 gameState.specScores[spec] += 2;
@@ -113,7 +112,6 @@ const clusterSafety = {
             const fb = document.getElementById('time-feedback');
             if (Math.abs(val - 2.5) < 0.1) {
                 fb.innerHTML = '✅ Правильно!';
-                gameState.psych.practical += 3;
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                 gameState.specScores[spec] += 3;

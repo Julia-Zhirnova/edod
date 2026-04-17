@@ -53,9 +53,7 @@ const clusterBusiness = {
     },
 
     wrapStory(story) {
-        return `<div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-            <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-        </div>`;
+        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     renderAccountant(diff) {
@@ -122,7 +120,6 @@ const clusterBusiness = {
             btn.addEventListener('click', () => {
                 if (btn.dataset.correct === 'true') {
                     btn.classList.add('correct');
-                    gameState.psych.org += 2;
                     const spec = gameState.selectedSpecialtyCode;
                     if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                     gameState.specScores[spec] += 2;
@@ -141,7 +138,6 @@ const clusterBusiness = {
             const fb = document.getElementById('salary-feedback');
             if (val === 26100) {
                 fb.innerHTML = '✅ Правильно!';
-                gameState.psych.analytic += 3;
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                 gameState.specScores[spec] += 3;

@@ -16,9 +16,6 @@ const clusterChem = {
         let content = '';
         if (diff === 0) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
                 <h3>🟢 Кислотность</h3>
                 <p>Какой pH у нейтрального раствора?</p>
                 <button class="game-btn" data-correct="true">7</button>
@@ -28,9 +25,6 @@ const clusterChem = {
             `;
         } else if (diff === 1) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
                 <h3>🟡 Посуда</h3>
                 <p>Для точного измерения объёма жидкости используют:</p>
                 <button class="game-btn" data-correct="true">Мерную колбу</button>
@@ -40,9 +34,6 @@ const clusterChem = {
             `;
         } else {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
                 <h3>🔴 Расчёт</h3>
                 <p>Сколько граммов NaCl нужно для 200 мл 0.9% раствора?</p>
                 <input type="number" id="mass-input" placeholder="Масса, г" step="0.1" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
@@ -51,7 +42,7 @@ const clusterChem = {
             `;
         }
 
-        area.innerHTML = header + content;
+        area.innerHTML = header + this.wrapStory(story) + content;
         this.setReplica(story);
         if (diff < 2) this.bindAnswer(area);
         else this.initMassCheck();
@@ -70,12 +61,15 @@ const clusterChem = {
         if (el) el.textContent = text;
     },
 
+    wrapStory(story) {
+        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
+    },
+
     bindAnswer(container) {
         container.querySelectorAll('.game-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (btn.dataset.correct === 'true') {
                     btn.classList.add('correct');
-                    gameState.psych.analytic += 2;
                     const spec = gameState.selectedSpecialtyCode;
                     if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                     gameState.specScores[spec] += 2;
@@ -94,7 +88,6 @@ const clusterChem = {
             const fb = document.getElementById('mass-feedback');
             if (Math.abs(val - 1.8) < 0.1) {
                 fb.innerHTML = '✅ Правильно!';
-                gameState.psych.analytic += 3;
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                 gameState.specScores[spec] += 3;

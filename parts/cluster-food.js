@@ -1,6 +1,6 @@
 // ==========================================
 // КЛАСТЕР: Пищевое производство
-// Специальности: 43.02.15 (повар-кондитер), 19.01.18 (аппаратчик)
+// Специальности: 43.02.15, 19.01.18
 // ==========================================
 
 const clusterFood = {
@@ -48,9 +48,7 @@ const clusterFood = {
     },
 
     wrapStory(story) {
-        return `<div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-            <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-        </div>`;
+        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     renderChef(diff) {
@@ -97,7 +95,6 @@ const clusterFood = {
             btn.addEventListener('click', () => {
                 if (btn.dataset.correct === 'true') {
                     btn.classList.add('correct');
-                    gameState.psych.practical += 2;
                     const spec = gameState.selectedSpecialtyCode;
                     if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                     gameState.specScores[spec] += 2;
@@ -116,7 +113,6 @@ const clusterFood = {
             const fb = document.getElementById('flour-feedback');
             if (Math.abs(val - 500) < 0.1) {
                 fb.innerHTML = '✅ Правильно!';
-                gameState.psych.practical += 3;
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                 gameState.specScores[spec] += 3;

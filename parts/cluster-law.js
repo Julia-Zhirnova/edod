@@ -48,9 +48,7 @@ const clusterLaw = {
     },
 
     wrapStory(story) {
-        return `<div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-            <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-        </div>`;
+        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
     },
 
     renderJurist(diff) {
@@ -98,7 +96,6 @@ const clusterLaw = {
             btn.addEventListener('click', () => {
                 if (btn.dataset.correct === 'true') {
                     btn.classList.add('correct');
-                    gameState.psych.analytic += 2;
                     const spec = gameState.selectedSpecialtyCode;
                     if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                     gameState.specScores[spec] += 2;
@@ -117,7 +114,6 @@ const clusterLaw = {
             const fb = document.getElementById('seq-feedback');
             if (val === '1,2,3,4' || val === '1, 2, 3, 4') {
                 fb.innerHTML = '✅ Правильно!';
-                gameState.psych.org += 3;
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                 gameState.specScores[spec] += 3;

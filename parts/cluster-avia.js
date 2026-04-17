@@ -10,8 +10,7 @@ const clusterAvia = {
 
         const header = this.getHeader();
         let story = '';
-        
-        // Определяем историю и рендерим в зависимости от специальности
+
         if (['15.02.16', '15.01.35', '15.01.38', '12.01.09'].includes(specCode)) {
             story = diff === 0 ? 'Для фестиваля нужно изготовить деталь по чертежу. С чего начнём?' :
                    diff === 1 ? 'Деталь почти готова, осталось соблюсти правильную последовательность операций.' :
@@ -43,13 +42,15 @@ const clusterAvia = {
         if (el) el.textContent = text;
     },
 
+    wrapStory(story) {
+        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
+    },
+
     renderMachining(area, header, story, specCode, diff) {
         let content = '';
         if (diff === 0) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🟢 Инструмент</h3>
                 <p>Чем нарезают внутреннюю резьбу?</p>
                 <button class="game-btn" data-correct="true">Метчик</button>
@@ -59,9 +60,7 @@ const clusterAvia = {
             `;
         } else if (diff === 1) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🟡 Последовательность</h3>
                 <p>Введи правильный порядок этапов (номера через запятую):</p>
                 <ol><li>Выбрать материал</li><li>Разметить заготовку</li><li>Обработать на станке</li><li>Контроль размеров</li></ol>
@@ -71,9 +70,7 @@ const clusterAvia = {
             `;
         } else {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🔴 Допуски</h3>
                 <p>Номинальный размер 120.00 мм, допуск ±0.05. Какие замеры пройдут контроль?</p>
                 <div style="text-align:left;">
@@ -98,38 +95,26 @@ const clusterAvia = {
     renderAviaProduction(area, header, story, diff) {
         let content = '';
         if (diff === 0) {
-            content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+            content = `${this.wrapStory(story)}
                 <h3>🟢 Осмотр планера</h3>
                 <p>Что проверяют при внешнем осмотре?</p>
                 <button class="game-btn" data-correct="true">Отсутствие вмятин и трещин</button>
                 <button class="game-btn">Давление в шинах</button>
-                <button class="game-btn">Уровень масла</button>
-            `;
+                <button class="game-btn">Уровень масла</button>`;
         } else if (diff === 1) {
-            content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+            content = `${this.wrapStory(story)}
                 <h3>🟡 Проверка двигателя</h3>
                 <p>Какой прибор измеряет тягу двигателя?</p>
                 <button class="game-btn" data-correct="true">Тягомер</button>
                 <button class="game-btn">Манометр</button>
-                <button class="game-btn">Тахометр</button>
-            `;
+                <button class="game-btn">Тахометр</button>`;
         } else {
-            content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+            content = `${this.wrapStory(story)}
                 <h3>🔴 Расчёт центровки</h3>
                 <p>Масса пустого самолёта 1000 кг, центровка 25% САХ. Добавили груз 200 кг на 2 м позади ЦТ. Куда сместится центровка?</p>
                 <button class="game-btn" data-correct="true">Назад (увеличится плечо)</button>
                 <button class="game-btn">Вперёд</button>
-                <button class="game-btn">Не изменится</button>
-            `;
+                <button class="game-btn">Не изменится</button>`;
         }
         area.innerHTML = header + content;
         this.setReplica(story);
@@ -139,38 +124,26 @@ const clusterAvia = {
     renderBpla(area, header, story, diff) {
         let content = '';
         if (diff === 0) {
-            content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+            content = `${this.wrapStory(story)}
                 <h3>🟢 Потеря связи</h3>
                 <p>Что проверить в первую очередь?</p>
                 <button class="game-btn" data-correct="true">Антенну и кабель</button>
                 <button class="game-btn">Прошивку полётного контроллера</button>
-                <button class="game-btn">Батарею</button>
-            `;
+                <button class="game-btn">Батарею</button>`;
         } else if (diff === 1) {
-            content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+            content = `${this.wrapStory(story)}
                 <h3>🟡 Настройка канала</h3>
                 <p>Какая частота обычно используется для управления БПЛА?</p>
                 <button class="game-btn" data-correct="true">2.4 ГГц</button>
                 <button class="game-btn">433 МГц</button>
-                <button class="game-btn">5.8 ГГц</button>
-            `;
+                <button class="game-btn">5.8 ГГц</button>`;
         } else {
-            content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+            content = `${this.wrapStory(story)}
                 <h3>🔴 Программирование автопилота</h3>
                 <p>Какой параметр отвечает за максимальный угол крена?</p>
                 <button class="game-btn" data-correct="true">ANGLE_MAX</button>
                 <button class="game-btn">ALT_HOLD</button>
-                <button class="game-btn">WP_RADIUS</button>
-            `;
+                <button class="game-btn">WP_RADIUS</button>`;
         }
         area.innerHTML = header + content;
         this.setReplica(story);
@@ -182,7 +155,6 @@ const clusterAvia = {
             btn.addEventListener('click', () => {
                 if (btn.dataset.correct === 'true') {
                     btn.classList.add('correct');
-                    gameState.psych.practical += 2;
                     const spec = gameState.selectedSpecialtyCode;
                     if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                     gameState.specScores[spec] += 2;
@@ -201,7 +173,6 @@ const clusterAvia = {
             const fb = document.getElementById('seq-feedback');
             if (val === '1,2,3,4' || val === '1, 2, 3, 4') {
                 fb.innerHTML = '✅ Правильно!';
-                gameState.psych.practical += 2;
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                 gameState.specScores[spec] += 2;
@@ -218,7 +189,6 @@ const clusterAvia = {
             let correct = true;
             cbs.forEach(cb => { if (cb.checked !== (cb.dataset.correct === 'true')) correct = false; });
             if (correct) {
-                gameState.psych.practical += 3;
                 const spec = gameState.selectedSpecialtyCode;
                 if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                 gameState.specScores[spec] += 3;
@@ -235,9 +205,18 @@ const clusterAvia = {
                 1: { story: 'Порядок: материал → разметка → обработка → контроль.', tip: '1,2,3,4' },
                 2: { story: 'Допуск ±0.05 означает интервал [119.95, 120.05].', tip: '119.97, 120.03, 120.00' }
             },
-            // ... аналогичные подсказки для остальных специальностей
+            '25.02.06': {
+                0: { story: 'Внешний осмотр — вмятины и трещины.', tip: 'Отсутствие вмятин и трещин' },
+                1: { story: 'Тягу измеряют тягомером.', tip: 'Тягомер' },
+                2: { story: 'Груз сзади смещает центровку назад.', tip: 'Назад' }
+            },
+            '25.02.08': {
+                0: { story: 'Сначала проверь антенну.', tip: 'Антенну и кабель' },
+                1: { story: 'Стандарт управления — 2.4 ГГц.', tip: '2.4 ГГц' },
+                2: { story: 'Максимальный угол крена — ANGLE_MAX.', tip: 'ANGLE_MAX' }
+            }
         };
-        return hints[specCode]?.[diff] || { story: 'Подумай логически.', tip: 'Попробуй ещё раз.' };
+        return hints[specCode]?.[diff] || hints['15.02.16'][diff] || { story: 'Подумай логически.', tip: 'Попробуй ещё раз.' };
     }
 };
 

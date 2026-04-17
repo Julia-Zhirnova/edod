@@ -8,7 +8,6 @@ const clusterIt = {
         const gameArea = document.getElementById('cluster-game-area');
         if (gameArea) gameArea.style.backgroundImage = "url('media/images/cluster-it-bg.jpg')";
 
-        // Заголовок с аватаром Гагарича (история будет отображаться отдельно в контенте)
         const header = this.getHeader();
         
         if (specCode === '09.02.06') {
@@ -33,6 +32,10 @@ const clusterIt = {
         if (el) el.textContent = text;
     },
 
+    wrapStory(story) {
+        return `<div style="margin-bottom:20px;"><p style="color:var(--text-dim);"><strong>📖</strong> ${story}</p></div>`;
+    },
+
     renderNetworkAdmin(area, header, diff) {
         const story = diff === 0 ? 'Сервер фестиваля упал! Гости не могут зарегистрироваться. Нужно срочно найти причину.' :
                      diff === 1 ? 'Служба веб-сервера не отвечает. Надо её перезапустить.' :
@@ -41,9 +44,7 @@ const clusterIt = {
         let content = '';
         if (diff === 0) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🟢 Диагностика сервера</h3>
                 <p>Какая команда покажет статус службы веб-сервера?</p>
                 <button class="game-btn" data-correct="true">systemctl status nginx</button>
@@ -53,9 +54,7 @@ const clusterIt = {
             `;
         } else if (diff === 1) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🟡 Перезапуск службы</h3>
                 <p>Как перезапустить веб-сервер nginx?</p>
                 <button class="game-btn" data-correct="true">systemctl restart nginx</button>
@@ -65,13 +64,25 @@ const clusterIt = {
             `;
         } else {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
-                <h3>🔴 Напиши скрипт проверки доступности сайта</h3>
-                <p>Напиши bash-скрипт, который проверяет HTTP-статус сайта festival.local и выводит "OK" или "FAIL".</p>
-                <textarea id="code-area" rows="6" style="width:100%; background:#222; color:#fff; border:1px solid #444; border-radius:8px; padding:10px;"></textarea>
-                <button class="check-code-btn" id="check-code-btn">Проверить</button>
+                ${this.wrapStory(story)}
+                <h3>🔴 Допиши недостающую строку в скрипте</h3>
+                <p>Скрипт проверки доступности сайта. Вставь пропущенную строку, которая выполняет HTTP-запрос.</p>
+                <pre style="background:#1e1e1e; color:#d4d4d4; padding:15px; border-radius:8px; overflow-x:auto; font-family:monospace; font-size:14px; text-align:left;">
+#!/bin/bash
+URL="http://festival.local"
+
+# --- Вставь недостающую строку ниже ---
+<span id="code-placeholder" style="background:#2d2d2d; display:inline-block; width:100%; padding:4px 0;">&nbsp;</span>
+# --- Конец вставки ---
+
+if [ $? -eq 0 ] && [ "$http_code" -eq 200 ]; then
+    echo "OK"
+else
+    echo "FAIL"
+fi
+                </pre>
+                <input type="text" id="code-input" placeholder="Введи недостающую строку" style="width:100%; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444; margin-top:15px;">
+                <button class="btn btn-primary" style="margin-top:15px;" id="check-code-btn">Проверить</button>
                 <p id="code-feedback"></p>
             `;
         }
@@ -90,9 +101,7 @@ const clusterIt = {
         let content = '';
         if (diff === 0) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🟢 HTML-форма отзыва</h3>
                 <p>Какой тег создаёт поле для ввода email?</p>
                 <button class="game-btn" data-correct="true">&lt;input type="email"&gt;</button>
@@ -102,9 +111,7 @@ const clusterIt = {
             `;
         } else if (diff === 1) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🟡 Валидация email (JavaScript)</h3>
                 <p>Какое регулярное выражение проверит email?</p>
                 <button class="game-btn" data-correct="true">/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/</button>
@@ -114,9 +121,7 @@ const clusterIt = {
             `;
         } else {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🔴 Сохранение отзыва</h3>
                 <p>Какой метод сохранит отзыв в localStorage?</p>
                 <button class="game-btn" data-correct="true">localStorage.setItem('review', text)</button>
@@ -139,9 +144,7 @@ const clusterIt = {
         let content = '';
         if (diff === 0) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🟢 SQL-инъекция</h3>
                 <p>Какой из запросов уязвим для инъекции?</p>
                 <button class="game-btn" data-correct="true">"SELECT * FROM users WHERE name = '" + name + "'"</button>
@@ -151,9 +154,7 @@ const clusterIt = {
             `;
         } else if (diff === 1) {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🟡 Восстановление из бэкапа</h3>
                 <p>Какая команда восстановит базу MySQL из дампа?</p>
                 <button class="game-btn" data-correct="true">mysql -u root -p dbname < backup.sql</button>
@@ -163,9 +164,7 @@ const clusterIt = {
             `;
         } else {
             content = `
-                <div class="story-box" style="background:rgba(0,212,255,0.1); padding:12px; border-radius:8px; margin-bottom:20px;">
-                    <p style="margin:0; color:var(--text-dim);"><strong>📖 История:</strong> ${story}</p>
-                </div>
+                ${this.wrapStory(story)}
                 <h3>🔴 Настройка iptables</h3>
                 <p>Какое правило заблокирует IP 192.168.1.100?</p>
                 <button class="game-btn" data-correct="true">iptables -A INPUT -s 192.168.1.100 -j DROP</button>
@@ -186,12 +185,7 @@ const clusterIt = {
                 const isCorrect = btn.dataset.correct === 'true';
                 if (isCorrect) {
                     btn.classList.add('correct');
-                    // Начисляем баллы специальности
                     const spec = gameState.selectedSpecialtyCode;
-                    if (spec === '09.02.06') gameState.psych.analytic += 2;
-                    else if (spec === '09.02.12') { gameState.psych.analytic += 1; gameState.psych.creative += 1; }
-                    else if (spec === '10.02.05') gameState.psych.analytic += 2;
-                    // Также увеличиваем счёт специальности
                     if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
                     gameState.specScores[spec] += 2;
                 } else {
@@ -204,40 +198,21 @@ const clusterIt = {
     },
 
     initCodeCheck() {
-        const textarea = document.getElementById('code-area');
-        if (typeof CodeMirror !== 'undefined') {
-            const editor = CodeMirror.fromTextArea(textarea, {
-                mode: 'shell',
-                theme: 'monokai',
-                lineNumbers: true
-            });
-            editor.setValue('#!/bin/bash\nresponse=$(curl -s -o /dev/null -w "%{http_code}" http://festival.local)\nif [ "$response" -eq 200 ]; then echo "OK"; else echo "FAIL"; fi');
-            document.getElementById('check-code-btn').onclick = () => {
-                const code = editor.getValue();
+        const expected = 'http_code=$(curl -s -o /dev/null -w "%{http_code}" $URL)';
+        document.getElementById('check-code-btn').onclick = () => {
+            const input = document.getElementById('code-input').value.trim();
+            const fb = document.getElementById('code-feedback');
+            if (input === expected || input === 'http_code=$(curl -s -o /dev/null -w "%{http_code}" $URL)') {
+                fb.innerHTML = '✅ Правильно!';
                 const spec = gameState.selectedSpecialtyCode;
-                if (code.includes('curl') && code.includes('200') && code.includes('echo')) {
-                    gameState.psych.analytic += 3;
-                    if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
-                    gameState.specScores[spec] += 3;
-                    document.getElementById('code-feedback').innerHTML = '✅ Отлично!';
-                } else {
-                    document.getElementById('code-feedback').innerHTML = '❌ Скрипт должен использовать curl и проверять код 200.';
-                }
+                if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
+                gameState.specScores[spec] += 3;
                 Cluster.gameSuccess();
-            };
-        } else {
-            textarea.value = '#!/bin/bash\nresponse=$(curl -s -o /dev/null -w "%{http_code}" http://festival.local)\nif [ "$response" -eq 200 ]; then echo "OK"; else echo "FAIL"; fi';
-            document.getElementById('check-code-btn').onclick = () => {
-                const code = textarea.value;
-                const spec = gameState.selectedSpecialtyCode;
-                if (code.includes('curl') && code.includes('200')) {
-                    gameState.psych.analytic += 3;
-                    if (!gameState.specScores[spec]) gameState.specScores[spec] = 0;
-                    gameState.specScores[spec] += 3;
-                }
+            } else {
+                fb.innerHTML = `❌ Неверно. Ожидалось: ${expected}`;
                 Cluster.gameSuccess();
-            };
-        }
+            }
+        };
     },
 
     getHint(specCode, diff) {
@@ -245,7 +220,7 @@ const clusterIt = {
             '09.02.06': {
                 0: { story: 'Гагарич вспоминает: когда сервер падает, первым делом смотрим статус службы.', tip: 'Правильная команда: systemctl status nginx' },
                 1: { story: 'Перезапуск часто решает проблему, но осторожно на продакшене!', tip: 'systemctl restart nginx' },
-                2: { story: 'Мониторинг — друг админа. Гагарич написал простой скрипт.', tip: 'Скрипт должен использовать curl и проверять HTTP-код.' }
+                2: { story: 'Нужно выполнить HTTP-запрос и сохранить код ответа. Используй curl с флагами -s -o /dev/null -w.', tip: 'http_code=$(curl -s -o /dev/null -w "%{http_code}" $URL)' }
             },
             '09.02.12': {
                 0: { story: 'Форма отзыва начинается с правильного поля ввода.', tip: 'Используй <input type="email">' },
